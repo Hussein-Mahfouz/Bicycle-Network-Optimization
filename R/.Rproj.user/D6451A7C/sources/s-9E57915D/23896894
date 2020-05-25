@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590404659453.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "23896894",
+    "lastKnownWriteTime" : 1590404703,
+    "last_content_update" : 1590404703955,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/flow data.R",
+    "project_path" : "flow data.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
