@@ -1,19 +1,19 @@
 {
     "collab_server" : "",
     "contents" : "",
-    "created" : 1590405859082.000,
+    "created" : 1590406607147.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
     "hash" : "0",
-    "id" : "D0A47513",
+    "id" : "40D1F769",
     "lastKnownWriteTime" : 1590067351,
     "last_content_update" : 1590067351,
     "path" : "~/Documents/Code Repos/spidercartographers/Scripts/choropleth maps.R",
     "project_path" : null,
     "properties" : {
-        "cursorPosition" : "9,91",
-        "scrollLine" : "0"
+        "cursorPosition" : "13,0",
+        "scrollLine" : "2"
     },
     "read_only" : false,
     "read_only_alternatives" : [
