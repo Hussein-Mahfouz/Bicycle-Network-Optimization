@@ -1,4 +1,0 @@
-#import spatial data using API: https://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_0
-msoa_boundaries <- st_read('https://opendata.arcgis.com/datasets/826dc85fb600440889480f4d9dbb1a24_0.geojson')
-# or download it locally and read it (faster)
-#spatial <- st_read('../data-raw/MSOA_2011_Boundaries/Middle_Layer_Super_Output_Areas__December_2011__Boundaries.shp')
