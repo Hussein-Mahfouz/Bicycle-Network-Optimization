@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590593578959.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B673B8EA",
+    "lastKnownWriteTime" : 1590611750,
+    "last_content_update" : 1590611750822,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/3_routing.R",
+    "project_path" : "3_routing.R",
+    "properties" : {
+        "cursorPosition" : "16,0",
+        "scrollLine" : "1",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
