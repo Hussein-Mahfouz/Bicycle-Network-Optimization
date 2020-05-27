@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590584556088.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "16A7BB25",
+    "lastKnownWriteTime" : 140582752109280,
+    "last_content_update" : 1590584556088,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "7DDDDA6C",
+        "caption" : "demand_decay",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=demand_decay&cache_key=7DDDDA6C",
+        "displayedObservations" : "349984",
+        "environment" : "",
+        "expression" : "demand_decay",
+        "object" : "demand_decay",
+        "preview" : "0",
+        "totalObservations" : "349984",
+        "variables" : "21"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
