@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590664828756.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "2261A255",
+    "lastKnownWriteTime" : 4374331933,
+    "last_content_update" : 1590664828756,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "5A7A578E",
+        "caption" : "flows_london",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=flows_london&cache_key=5A7A578E",
+        "displayedObservations" : 349984,
+        "environment" : "",
+        "expression" : "flows_london",
+        "object" : "flows_london",
+        "preview" : 0,
+        "totalObservations" : 349984,
+        "variables" : 16
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

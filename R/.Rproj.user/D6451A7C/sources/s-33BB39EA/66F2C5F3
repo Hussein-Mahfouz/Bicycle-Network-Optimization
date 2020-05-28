@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590662265254.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "66F2C5F3",
+    "lastKnownWriteTime" : 4412750543122677053,
+    "last_content_update" : 1590662265254,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "222D712C",
+        "caption" : "flows",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=flows&cache_key=222D712C",
+        "displayedObservations" : "2402201",
+        "environment" : "",
+        "expression" : "flows",
+        "object" : "flows",
+        "preview" : "0",
+        "totalObservations" : "2402201",
+        "variables" : "14"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

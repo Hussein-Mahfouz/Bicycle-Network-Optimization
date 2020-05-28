@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590664877630.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9599E2EC",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1590664877630,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "D097CBF8",
+        "caption" : "msoas_london",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=msoas_london&cache_key=D097CBF8",
+        "displayedObservations" : 978,
+        "environment" : "",
+        "expression" : "msoas_london",
+        "object" : "msoas_london",
+        "preview" : 0,
+        "totalObservations" : 978,
+        "variables" : 5
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 13,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

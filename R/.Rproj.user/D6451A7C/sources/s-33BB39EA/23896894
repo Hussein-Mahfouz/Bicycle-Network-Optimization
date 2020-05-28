@@ -7,13 +7,13 @@
     "folds" : "",
     "hash" : "0",
     "id" : "23896894",
-    "lastKnownWriteTime" : 1590584341,
-    "last_content_update" : 1590584341776,
+    "lastKnownWriteTime" : 1590658126,
+    "last_content_update" : 1590658126025,
     "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/1_flow_data.R",
     "project_path" : "1_flow_data.R",
     "properties" : {
-        "cursorPosition" : "96,42",
-        "scrollLine" : "77",
+        "cursorPosition" : "77,0",
+        "scrollLine" : "65",
         "tempName" : "Untitled1"
     },
     "read_only" : false,

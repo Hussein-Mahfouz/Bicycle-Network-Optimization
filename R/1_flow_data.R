@@ -46,7 +46,8 @@ flows_london <- flows_internal("London")
 #import spatial data using API: https://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_0
 #msoa_boundaries <- st_read('https://opendata.arcgis.com/datasets/826dc85fb600440889480f4d9dbb1a24_0.geojson')
 # or download it locally and read it (faster)
-msoa_boundaries <- st_read('../data-raw/MSOA_2011_Boundaries/Middle_Layer_Super_Output_Areas__December_2011__Boundaries.shp')
+msoa_boundaries <- st_read('../data-raw/MSOA_2011_Boundaries/Middle_Layer_Super_Output_Areas__December_2011__Boundaries.shp') %>%
+                   st_transform(4326)   # transform to EPSG 4326 for dodgr routing later
 
 # function to filter MSOAs that are within a certain city
 msoas_city <- function(name) {
@@ -58,15 +59,13 @@ msoas_london <- msoas_city("London")
 
 # Add spatial data to london msoas
 spatial_london <- msoas_london[, c("MSOA11CD", "MSOA11NM")] %>% left_join(msoa_boundaries[ , c("msoa11cd", "geometry")],
-                              by = c("MSOA11CD" = "msoa11cd")) %>% st_as_sf() %>% st_make_valid() %>%
+                              by = c("MSOA11CD" = "msoa11cd")) %>% st_as_sf() %>% lwgeom::st_make_valid() %>%
                   mutate(centroid = st_centroid(geometry))  # we will need centroids to calculate distance matrix
 
-
-# transform back to sf and handle invalid geometries
-#spatial_london <- spatial_london %>% st_as_sf() %>% st_make_valid()
-# plot to check
-#plot(st_geometry(spatial_london))
-
+# save the output for routing later. Remove borders and set centroids as geometry, then save 
+# this does not overwrite 'spatial_london' sf
+st_drop_geometry(spatial_london) %>% st_set_geometry('centroid') %>%
+  st_write("../data/msoa_centroids.geojson") 
 
 ###############
 # DISTANCE MATRIX
