@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590695815707.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1942283477",
+    "id" : "C1A7BAF2",
+    "lastKnownWriteTime" : 1590695842,
+    "last_content_update" : 1590695842938,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/2_distance_matrix.R",
+    "project_path" : "2_distance_matrix.R",
+    "properties" : {
+        "cursorPosition" : "127,65",
+        "scrollLine" : "113",
+        "source_window_id" : "",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

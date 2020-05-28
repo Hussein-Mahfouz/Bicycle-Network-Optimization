@@ -127,3 +127,7 @@ distances <- flows_london %>%
 # save for reference
 write_csv(distances, path = "../data/dist_straight_vs_dodgr.csv")
 
+# remove variables from global environment
+rm(city_names, dist_mat, distances, msoa_boundaries, spatial_london, msoas_london)
+
+

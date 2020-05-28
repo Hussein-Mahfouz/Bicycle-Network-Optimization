@@ -89,7 +89,7 @@ dist_mat <- cbind(msoa_centroids$MSOA11CD, dist_mat) %>% rename(from = `msoa_cen
 dist_mat <- dist_mat %>%
   pivot_longer(-from, names_to = "to", values_to = "dist")
 
-# save to use in calculation of potential demand (script: )
+# save to use in calculation of potential demand (next script)
 flows_london %>% subset(select = -c(geom_orig, cent_orig, geom_dest, cent_dest)) %>%
    left_join(dist_mat, by = c("Area of residence" = "from" , "Area of workplace" = "to")) %>%
    write_csv(path = "../data/flows_dist_for_potential_flow.csv")
