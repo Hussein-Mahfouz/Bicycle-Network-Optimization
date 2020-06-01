@@ -39,6 +39,6 @@ flows_london <- flows_internal("London")
 write_csv(flows_london, path = "../data/flows_london.csv")
 
 # remove variables from global environment
-rm(flows, flows_london)
+rm(flows, flows_london, flows_internal)
 
 

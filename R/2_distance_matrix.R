@@ -20,7 +20,7 @@ msoas_city <- function(name) {
   return(x)
 }
 
-# get msoas in London
+# get msoas in London  
 msoas_london <- msoas_city("London")
 
 # Add spatial data to london msoas
@@ -51,7 +51,9 @@ split_lon_lat <- function(x, names = c("lon","lat")) {
 msoa_lon_lat <- msoa_centroids %>% split_lon_lat() %>% st_drop_geometry() %>% 
                     select(c(lon, lat))
 
-
+# save this version for routing in `4_aggregating_flows`
+msoa_centroids %>% split_lon_lat() %>% select(-c(MSOA11NM)) %>% 
+  write_csv(path = "../data/msoa_lon_lat.csv")
 
 ############
 # DISTANCE MATRIX USING DODGR
@@ -72,8 +74,7 @@ graph <- weight_streetnet(streetnet, wt_profile = "bicycle")
 #save the data so that you don't have to do this again
 readr::write_csv(graph, path = "../data/weighted_graph.csv")
 #write_csv(graph_sc, path = "../data/weighted_graph_sc.csv")
-# read it back in and use it in dodgr::dodgr_dists
-x <- read_csv('../data/weighted_graph.csv') 
+
 
 # contract graph for faster routing
 graph_contracted <- dodgr_contract_graph(graph)
@@ -99,33 +100,33 @@ flows_london %>% subset(select = -c(geom_orig, cent_orig, geom_dest, cent_dest))
 # GETTING SF STRAIGHT LINE DISTANCES TO COMPARE WITH RESULTS
 ##########
 
-flows_london <- read_csv("../data/flows_london.csv") %>% 
-      subset(select = -c(city_origin, city_dest))
-
-# add geometry of origin
-flows_london <- flows_london %>% left_join(spatial_london[ , c("MSOA11CD", "geometry", "centroid")], 
-                                           by = c("Area of residence" = "MSOA11CD")) %>%
-  rename(geom_orig = geometry, cent_orig = centroid)
-# add geometry of destination
-flows_london <- flows_london %>% left_join(spatial_london[ , c("MSOA11CD", "geometry", "centroid")], 
-                                           by = c("Area of workplace" = "MSOA11CD")) %>%
-  rename(geom_dest = geometry, cent_dest = centroid)
-
-# get straight line distances - this takes TIMMEEEE
-flows_london <- flows_london %>% 
-  mutate(dist =st_distance(cent_orig, cent_dest, by_element = T))
-
-
-# Create dataframe with both straight line distances and dodgr distance
-distances <- flows_london %>% 
-  subset(select = -c(geom_orig, geom_dest, cent_orig, cent_dest)) %>% 
-  subset(select = c(`Area of residence`, `Area of workplace`, dist)) %>%
-  rename(dist_straight = dist) %>% 
-  left_join(dist_mat, by = c("Area of residence" = "from", "Area of workplace" = "to")) %>%
-  rename(dist_dodgr = dist)
-
-# save for reference
-write_csv(distances, path = "../data/dist_straight_vs_dodgr.csv")
+# flows_london <- read_csv("../data/flows_london.csv") %>% 
+#       subset(select = -c(city_origin, city_dest))
+# 
+# # add geometry of origin
+# flows_london <- flows_london %>% left_join(spatial_london[ , c("MSOA11CD", "geometry", "centroid")], 
+#                                            by = c("Area of residence" = "MSOA11CD")) %>%
+#   rename(geom_orig = geometry, cent_orig = centroid)
+# # add geometry of destination
+# flows_london <- flows_london %>% left_join(spatial_london[ , c("MSOA11CD", "geometry", "centroid")], 
+#                                            by = c("Area of workplace" = "MSOA11CD")) %>%
+#   rename(geom_dest = geometry, cent_dest = centroid)
+# 
+# # get straight line distances - this takes TIMMEEEE
+# flows_london <- flows_london %>% 
+#   mutate(dist =st_distance(cent_orig, cent_dest, by_element = T))
+# 
+# 
+# # Create dataframe with both straight line distances and dodgr distance
+# distances <- flows_london %>% 
+#   subset(select = -c(geom_orig, geom_dest, cent_orig, cent_dest)) %>% 
+#   subset(select = c(`Area of residence`, `Area of workplace`, dist)) %>%
+#   rename(dist_straight = dist) %>% 
+#   left_join(dist_mat, by = c("Area of residence" = "from", "Area of workplace" = "to")) %>%
+#   rename(dist_dodgr = dist)
+# 
+# # save for reference
+# write_csv(distances, path = "../data/dist_straight_vs_dodgr.csv")
 
 # remove variables from global environment
 rm(city_names, dist_mat, distances, msoa_boundaries, spatial_london, msoas_london)

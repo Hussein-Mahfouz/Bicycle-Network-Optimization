@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591024177437.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "28|34|31|0|\n42|30|45|0|\n65|54|73|0|\n",
+    "hash" : "0",
+    "id" : "842BEE12",
+    "lastKnownWriteTime" : 1591028960,
+    "last_content_update" : 1591028960915,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/oxford_example.R",
+    "project_path" : "oxford_example.R",
+    "properties" : {
+        "cursorPosition" : "8,8",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -2,7 +2,7 @@ library(tidyverse)
 library(stplanr)
 
 # read in the data
-flow <- readr::read_csv("../data/msoa_distances.csv")
+flow <- readr::read_csv("../data/flows_dist_for_potential_flow.csv")
 
 # get potential demand
 
@@ -24,6 +24,10 @@ demand_decay <- demand_decay %>%
   mutate(potential_demand = round((`All categories: Method of travel to work` - active_travel) * uptake_dutch) +
            active_travel) 
 
+# save csv to use in '4_aggregating_flows'
+demand_decay %>% 
+  subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
+  write_csv(path = "../data/flows_for_aggregated_routing.csv")
 
 # % increase in active travel
 demand_decay$perc_increase = (((demand_decay$potential_demand - demand_decay$active_travel) / 
@@ -40,17 +44,17 @@ demand_decay$perc_increase = (((demand_decay$potential_demand - demand_decay$act
 # 4. private: fraction of private vehicle flow that should be considered potential cycling demand
 # 3 & 4 are 0 if distance between MSOA pair > max_dist
 
-potential_demand <- function(data, max_dist = 6000, public = 0.5, private = 1) {
-  name <- data %>% 
-    mutate(active = Bicycle + `On foot`) %>%
-    mutate(sustainable = (`Underground, metro, light rail, tram` + Train + `Bus, minibus or coach`)) %>%
-    mutate(motor = (`All categories: Method of travel to work` - (sustainable + active))) %>%
-    mutate(potential_demand = if_else(dist <= max_dist, round(active + sustainable*public + motor*private), active))
-    return(name)
-}
-
-# use function to get potential demand
-demand_dist <- potential_demand(data=flow)
+# potential_demand <- function(data, max_dist = 6000, public = 0.5, private = 1) {
+#   name <- data %>% 
+#     mutate(active = Bicycle + `On foot`) %>%
+#     mutate(sustainable = (`Underground, metro, light rail, tram` + Train + `Bus, minibus or coach`)) %>%
+#     mutate(motor = (`All categories: Method of travel to work` - (sustainable + active))) %>%
+#     mutate(potential_demand = if_else(dist <= max_dist, round(active + sustainable*public + motor*private), active))
+#     return(name)
+# }
+# 
+# # use function to get potential demand
+# demand_dist <- potential_demand(data=flow)
 
 
 ###############
