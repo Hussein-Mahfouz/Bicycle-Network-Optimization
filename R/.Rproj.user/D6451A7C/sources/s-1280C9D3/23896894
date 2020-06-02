@@ -4,15 +4,15 @@
     "created" : 1590404659453.000,
     "dirty" : false,
     "encoding" : "UTF-8",
-    "folds" : "29|34|32|0|\n",
+    "folds" : "",
     "hash" : "0",
     "id" : "23896894",
     "lastKnownWriteTime" : 1591030215,
-    "last_content_update" : 1591030215917,
+    "last_content_update" : 1591093823940,
     "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/1_get_flow_data.R",
     "project_path" : "1_get_flow_data.R",
     "properties" : {
-        "cursorPosition" : "13,41",
+        "cursorPosition" : "31,11",
         "scrollLine" : "0",
         "tempName" : "Untitled1"
     },

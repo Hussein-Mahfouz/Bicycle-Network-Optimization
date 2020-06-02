@@ -33,7 +33,7 @@ flows_internal <- function(name) {
 
 # use function to get flows between all MSOAs in Oxford
 flows_ox <- flows_internal("Oxford") %>% select(1:3) %>% 
-  rename(potential_demand = `All categories: Method of travel to work`)
+  rename(potential_demand = `All categories: Method of travel to work`)   # TEMPORARY!!
 
 # download spatial data locally and read it
 msoa_boundaries <- st_read('../data-raw/MSOA_2011_Boundaries/Middle_Layer_Super_Output_Areas__December_2011__Boundaries.shp') %>%
@@ -61,6 +61,55 @@ msoa_centroids <-
   st_drop_geometry(spatial_ox) %>% 
   st_set_geometry('centroid') 
 
+
+#######################
+# SNAPPING CENTROIDS TO MAIN OSM ROADS. Do this to prevent centroids snapping to innaccessible road segments
+
+#1. Get stree network and filter main road types (filter argument can be changed)
+roads <- dodgr_streetnet("oxford uk", expand = 0.05) %>% 
+      filter(highway %in% c('primary', 'secondary', 'tertiary'))
+
+#2. snap centroids to lines
+
+# function from https://stackoverflow.com/questions/51292952/snap-a-point-to-the-closest-point-on-a-line-segment-using-sf
+st_snap_points = function(x, y, max_dist = 1000) {
+  
+  if (inherits(x, "sf")) n = nrow(x)
+  if (inherits(x, "sfc")) n = length(x)
+  
+  out = do.call(c,
+                lapply(seq(n), function(i) {
+                  nrst = st_nearest_points(st_geometry(x)[i], y)
+                  nrst_len = st_length(nrst)
+                  nrst_mn = which.min(nrst_len)
+                  if (as.vector(nrst_len[nrst_mn]) > max_dist) return(st_geometry(x)[i])
+                  return(st_cast(nrst[nrst_mn], "POINT")[2])
+                })
+  )
+  return(out)
+}
+
+msoa_centroids_snapped <- 
+  st_snap_points(msoa_centroids, roads, max_dist = 500) %>%   # if dist to nearest road > max dist, point is unchanged
+  st_as_sf() %>%   # convert to get it in a dataframe
+  bind_cols(msoa_centroids) %>%  # bind with msoa centroids df to ge MSOA IDs
+  select(-c(centroid)) %>% # drop old geometry
+  rename(centroid = x)
+
+# check how the points were shifted
+plot(st_geometry(roads))
+plot(st_geometry(msoa_centroids), add = TRUE, col = 'red')
+plot(st_geometry(msoa_centroids_snapped), add = TRUE, col = 'green')
+
+# check that bind_cols() was correct. Plot individual points:
+plot(st_geometry(roads))
+plot(st_geometry(msoa_centroids$centroid[5]), add = TRUE, col = 'red')
+plot(st_geometry(msoa_centroids_snapped$centroid[5]), add = TRUE, col = 'green')
+#clear environment
+rm(roads)
+########################
+
+
 # function to split c(lat, lon) to two seperate columns  FROM JM London (https://github.com/r-spatial/sf/issues/231)
 # lat = Y lon = X
 split_lon_lat <- function(x, names = c("lon","lat")) {
@@ -81,8 +130,22 @@ lon_lat <-  msoa_centroids %>% split_lon_lat() %>% select(-c(MSOA11NM))
 # ROUTING USING DODGR
 ############
 
-# this downloads all the road data from OSM (equivalent to : key = 'highway')
-streetnet <- dodgr_streetnet("oxford uk", expand = 0.05)
+# USING OSM
+
+##########
+# bb <- osmdata::getbb ("oxford uk", format_out = "polygon")
+# Result of above query cn be passed directly to streetnet, but we want to add a buffer. 
+# Buffers can be added using expand in `dodgr_streetnet("oxford uk", expand = 0.05)`. the problem with this 
+# is that it gets a rectangular bb. I want something more compact (i.e buffer around city boundary). This is 
+# done to deal with RAM limitations
+##########
+
+# get compact bounding box with buffer
+
+# check functions.R for documentation. 
+bb_ox <- bb_buffer(city= "oxford uk", buffer= 1000)
+
+streetnet <- dodgr_streetnet (bbox = bb_ox) 
 graph <- weight_streetnet(streetnet, wt_profile = "bicycle")
 
 # remove flows where ORIGIN = DESTINATION

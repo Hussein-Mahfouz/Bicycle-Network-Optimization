@@ -37,9 +37,15 @@ to <- colnames(od_flow_matrix) %>% as.data.frame() %>% left_join(lon_lat, by = c
 #   # select first 10 rows then 1st 10 columns
 # od_flow_matrix_2 <- od_flow_matrix %>% as.data.frame() %>% slice(1:10) %>% select(1:10) %>% as.matrix()
 
-# route
+# ROUTE
 
-streetnet <- dodgr_streetnet("london uk", expand = 0.05)
+# get road network
+
+# bounding box function attempt (Fails)
+# bb_ldn <- bb_buffer(city = "london uk", buffer = 1000)
+# streetnet <- dodgr_streetnet(bbox = bb_ldn)    # `Error: vector memory exhausted (limit reached?)`
+
+streetnet <- dodgr_streetnet("london uk", expand = 0.05) # 217101 rows    # 1794.96 mb
 graph <- weight_streetnet(streetnet, wt_profile = "bicycle")
 # free up some space
 rm(streetnet)
