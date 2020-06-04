@@ -72,7 +72,8 @@ msoa_centroids <-
 # SNAPPING CENTROIDS TO MAIN OSM ROADS. Do this to prevent centroids snapping to innaccessible road segments
 
 #1. Get stree network and filter main road types (filter argument can be changed)
-roads <- dodgr_streetnet("oxford uk", expand = 0.05) %>% 
+pts <- st_coordinates (msoa_centroids)
+roads <- dodgr_streetnet(pts = pts, expand = 0.05) %>% 
       filter(highway %in% c('primary', 'secondary', 'tertiary'))
 
 #2. snap centroids to lines
@@ -116,24 +117,11 @@ plot(st_geometry(msoa_centroids_snapped$centroid[1]), add = TRUE, col = 'green')
 rm(roads)
 ########################
 
-
-# function to split c(lat, lon) to two seperate columns  FROM JM London (https://github.com/r-spatial/sf/issues/231)
-# lat = Y lon = X
-split_lon_lat <- function(x, names = c("lon","lat")) {
-  stopifnot(inherits(x,"sf") && inherits(sf::st_geometry(x),"sfc_POINT"))
-  ret <- sf::st_coordinates(x)
-  ret <- tibble::as_tibble(ret)
-  stopifnot(length(names) == ncol(ret))
-  x <- x[ , !names(x) %in% names]
-  ret <- setNames(ret,names)
-  dplyr::bind_cols(x,ret)
-}
-
-
 # get lon and lat as seperate columns
-#lon_lat <-  msoa_centroids %>% split_lon_lat() %>% select(-c(MSOA11NM)) 
-lon_lat <-  msoa_centroids_snapped %>% split_lon_lat() %>% select(-c(MSOA11NM)) 
-
+lon_lat <- msoa_centroids_snapped %>% 
+  cbind(st_coordinates(msoa_centroids_snapped)) %>%
+  rename(lon = X, lat = Y) %>%  
+  select(-c(MSOA11NM)) 
 
 ############
 # ROUTING USING DODGR
@@ -143,7 +131,7 @@ lon_lat <-  msoa_centroids_snapped %>% split_lon_lat() %>% select(-c(MSOA11NM))
 
 ##########
 # bb <- osmdata::getbb ("oxford uk", format_out = "polygon")
-# Result of above query cn be passed directly to streetnet, but we want to add a buffer. 
+# Result of above query can be passed directly to streetnet, but we want to add a buffer. 
 # Buffers can be added using expand in `dodgr_streetnet("oxford uk", expand = 0.05)`. the problem with this 
 # is that it gets a rectangular bb. I want something more compact (i.e buffer around city boundary). This is 
 # done to deal with RAM limitations
@@ -154,8 +142,9 @@ lon_lat <-  msoa_centroids_snapped %>% split_lon_lat() %>% select(-c(MSOA11NM))
 #bb_ox <- bb_buffer(city= "oxford uk", buffer= 1000)
 #streetnet <- dodgr_streetnet (bbox = bb_ox) 
 ##########
+pts <- st_coordinates (lon_lat)
+streetnet <- dodgr_streetnet(pts = pts, expand = 0.05)
 
-streetnet <- dodgr_streetnet("oxford uk", expand = 0.05)
 graph <- weight_streetnet(streetnet, wt_profile = "bicycle")
 
 

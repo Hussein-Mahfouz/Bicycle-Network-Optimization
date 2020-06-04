@@ -3,6 +3,7 @@ library(dodgr)
 library(sf)
 library(osmdata)
 library(lwgeom)
+library(pct)
 
 ###############
 # IMPORTING SPATIAL DATA FOR ROUTING
@@ -25,10 +26,10 @@ msoas_london <- msoas_city("London")
 
 # Add spatial data to london msoas
 spatial_london <- 
-    msoas_london[, c("MSOA11CD", "MSOA11NM")] %>% 
-    left_join(msoa_boundaries[ , c("msoa11cd", "geometry")], by = c("MSOA11CD" = "msoa11cd")) %>% 
-    st_as_sf() %>% lwgeom::st_make_valid() %>%
-    mutate(centroid = st_centroid(geometry))  # we will need centroids to calculate distance matrix
+  msoas_london[, c("MSOA11CD", "MSOA11NM")] %>% 
+  left_join(msoa_boundaries[ , c("msoa11cd", "geometry")], by = c("MSOA11CD" = "msoa11cd")) %>% 
+  st_as_sf() %>% lwgeom::st_make_valid() %>%
+  mutate(centroid = st_centroid(geometry))  # we will need centroids to calculate distance matrix
 
 # Remove border geometry and set centroids as geometry. This does not overwrite 'spatial_london' sf
 msoa_centroids <- 
@@ -49,7 +50,7 @@ split_lon_lat <- function(x, names = c("lon","lat")) {
 
 # add lon and lat columns to dataframe using sfc_as_cols function
 msoa_lon_lat <- msoa_centroids %>% split_lon_lat() %>% st_drop_geometry() %>% 
-                    select(c(lon, lat))
+  select(c(lon, lat))
 
 # save this version for routing in `4_aggregating_flows`
 msoa_centroids %>% split_lon_lat() %>% select(-c(MSOA11NM)) %>% 
@@ -92,9 +93,9 @@ dist_mat <- dist_mat %>%
 
 # save to use in calculation of potential demand (next script)
 flows_london %>% subset(select = -c(geom_orig, cent_orig, geom_dest, cent_dest)) %>%
-   left_join(dist_mat, by = c("Area of residence" = "from" , "Area of workplace" = "to")) %>%
-   write_csv(path = "../data/flows_dist_for_potential_flow.csv")
-  
+  left_join(dist_mat, by = c("Area of residence" = "from" , "Area of workplace" = "to")) %>%
+  write_csv(path = "../data/flows_dist_for_potential_flow.csv")
+
 
 ##########
 # GETTING SF STRAIGHT LINE DISTANCES TO COMPARE WITH RESULTS

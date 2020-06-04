@@ -29,3 +29,15 @@ flows_internal <- function(name) {
 
 # use function to get flows between all MSOAs in Liverpool
 flows_liv <- flows_internal("Liverpool")
+
+
+
+
+# MORE PCT QUERIES
+
+lsoa <- pct::get_pct(region = "london", layer = "z", geography = "lsoa")
+# get centroids
+lsoa_c <- pct::get_pct_centroids( region = "london", geography = "lsoa") %>%
+              select(c(geo_code, geometry))
+
+

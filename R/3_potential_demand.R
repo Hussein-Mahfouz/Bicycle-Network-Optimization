@@ -63,3 +63,14 @@ demand_decay$perc_increase = (((demand_decay$potential_demand - demand_decay$act
 
 
 
+#plot distance vs flow
+
+
+ggplot(data = flow) +
+  #geom_point(mapping = aes(x = dist, y = Bicycle)) +
+  geom_smooth(mapping = aes(x = dist, y = Bicycle))
+
+
+
+  
+

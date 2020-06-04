@@ -16,7 +16,7 @@ od_flow_matrix <-
   od_flow %>% 
   pivot_wider(names_from = `Area of workplace`, values_from = potential_demand) %>%
   tibble::column_to_rownames(var = "Area of residence") %>%  
-  replace(is.na(.), 0) %>% as.matrix()
+  replace(is.na(.), 0) %>% as.matrix()    # EDIT THIS!!!!!
 
 
 
@@ -47,6 +47,9 @@ to <- colnames(od_flow_matrix) %>% as.data.frame() %>% left_join(lon_lat, by = c
 
 streetnet <- dodgr_streetnet("london uk", expand = 0.05) # 217101 rows    # 1794.96 mb
 graph <- weight_streetnet(streetnet, wt_profile = "bicycle")
+#OR IF IT IS SAVED
+#graph <- readRDS("../data/london_roads.Rds")
+
 # free up some space
 rm(streetnet)
 # I have it stored locally, but perhaps it is better to generate it from the distance_matrix script,
