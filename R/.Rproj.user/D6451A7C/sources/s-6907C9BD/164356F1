@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591187109581.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "50|47|81|0|\n88|42|120|0|\n",
+    "hash" : "0",
+    "id" : "164356F1",
+    "lastKnownWriteTime" : 1591264663,
+    "last_content_update" : 1591267143803,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/5_prioritizing_segments.R",
+    "project_path" : "5_prioritizing_segments.R",
+    "properties" : {
+        "cursorPosition" : "122,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled2"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
