@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591459495940.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "27483010",
+    "lastKnownWriteTime" : 8746391181558637610,
+    "last_content_update" : 1591459495940,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "90B40135",
+        "caption" : "flow_sub",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=flow_sub&cache_key=90B40135",
+        "displayedObservations" : 61051,
+        "environment" : "",
+        "expression" : "flow_sub",
+        "object" : "flow_sub",
+        "preview" : 0,
+        "totalObservations" : 61051,
+        "variables" : 15
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
