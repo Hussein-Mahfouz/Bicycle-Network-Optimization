@@ -3,7 +3,8 @@ library(stplanr)
 
 # read in the data
 flow <- readr::read_csv("../data/alt_city/flows_dist_elev_for_potential_flow.csv")
-
+# replace NA slope values with 0
+flow$slope[is.na(flow$slope)] <- 0
 ###############
 # OPTION 1: Use a distance decay function from stplanr https://itsleeds.github.io/pct/reference/uptake_pct_godutch.html
 ###############
@@ -19,19 +20,18 @@ demand_decay <- demand_decay %>%
   # get current active travel
   mutate(active_travel = Bicycle + `On foot`) %>% 
   # get potential active travel: non-active modes * distance decay parameter
-  mutate(potential_demand = round((`All categories: Method of travel to work` - active_travel) * uptake_dutch) +
-           active_travel) 
+  mutate(potential_demand = round((`All categories: Method of travel to work` - active_travel) * uptake_dutch) + active_travel) 
 
 # save csv to use in '4_aggregating_flows'
 demand_decay %>% 
   subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
   write_csv(path = "../data/alt_city/flows_for_aggregated_routing_opt_1.csv")
 
-# % increase in active travel
-demand_decay$perc_increase = (((demand_decay$potential_demand - demand_decay$active_travel) / 
-                                 demand_decay$active_travel) *100)
+# all number should be above 0. Cycling should not be more than toal trips...
+demand_decay$increase = demand_decay$`All categories: Method of travel to work` - demand_decay$potential_demand
 
-
+# remove
+rm(demand_decay)
 
 
 
