@@ -3,7 +3,11 @@ library(stplanr)
 
 # read in the data
 flow <- readr::read_csv("../data/flows_dist_for_potential_flow.csv")
+#flow <- readr::read_csv("../data/flows_dist_elev_for_potential_flow.csv")
 
+# left join flow and centroids and then:
+# use stplanr::route_dodgr to get shortest path geometry
+# slopes::slope_raster to get average slope for each OD pair
 # get potential demand
 
 ###############

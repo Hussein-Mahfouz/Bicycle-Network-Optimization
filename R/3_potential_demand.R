@@ -3,8 +3,8 @@ library(stplanr)
 
 # read in the data
 flow <- readr::read_csv("../data/flows_dist_for_potential_flow.csv")
+#flow <- readr::read_csv("../data/flows_dist_elev_for_potential_flow.csv")
 
-# get potential demand
 
 ###############
 # OPTION 1: Use a distance decay function from stplanr https://itsleeds.github.io/pct/reference/uptake_pct_godutch.html

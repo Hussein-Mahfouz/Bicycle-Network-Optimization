@@ -3,6 +3,21 @@ library(dodgr)
 library(sf)
 library(osmdata)
 library(lwgeom)
+library(raster)
+library(slopes)
+
+###### ELEVATION DATA - START
+#London is split between two tiles. we load both and then merge them
+uk_1 <- raster::raster('../data-raw/UK_Elevation/srtm_36_02.tif')
+uk_2 <- raster::raster('../data-raw/UK_Elevation/srtm_37_02.tif')
+#merge
+uk_elev <- raster::merge(uk_1, uk_2)
+# write to disk for osm_elevation function (need to pass file path...)
+writeRaster(uk_elev, '../data/uk_elev.tif')
+# we only need the merged one
+rm(uk_1, uk_2, uk_elev)
+###### ELEVATION DATA - END
+
 
 # this is a lookup table matching MSOAs to major towns and cities
 city_names <- read_csv('../data-raw/Middle_Layer_Super_Output_Area__2011__to_Major_Towns_and_Cities__December_2015__Lookup_in_England_and_Wales.csv') 
@@ -33,7 +48,7 @@ flows_internal <- function(name) {
 }
 
 # use function to get flows between all MSOAs in Oxford 
-flows_ox <- flows_internal("Oxford") %>% select(1:3) %>% 
+flows_ox <- flows_internal("Oxford") %>% dplyr::select(1:3) %>% 
   rename(potential_demand = `All categories: Method of travel to work`)   # TEMPORARY!!
 
 #clear env
@@ -100,7 +115,7 @@ msoa_centroids_snapped <-
   st_snap_points(msoa_centroids, roads, max_dist = 1000) %>%   # if dist to nearest road > max dist, point is unchanged
   st_as_sf() %>%   # convert to get it in a dataframe
   bind_cols(msoa_centroids) %>%  # bind with msoa centroids df to ge MSOA IDs
-  select(-c(centroid)) %>% # drop old geometry
+  dplyr::select(-c(centroid)) %>% # drop old geometry
   rename(centroid = x)
 
 # check how the points were shifted
@@ -121,7 +136,58 @@ rm(roads)
 lon_lat <- msoa_centroids_snapped %>% 
   cbind(st_coordinates(msoa_centroids_snapped)) %>%
   rename(lon = X, lat = Y) %>%  
-  select(-c(MSOA11NM)) 
+  dplyr::select(-c(MSOA11NM)) 
+
+
+########## ELEVATION - REMOVE LATER - START
+
+flows_ox2 <- flows_ox %>% left_join(msoa_centroids_snapped,
+                       by = c("Area of residence" = "MSOA11CD")) %>%
+  rename(cent_orig = centroid) 
+
+flows_ox2 <- flows_ox2 %>% left_join(msoa_centroids_snapped,
+                       by = c("Area of workplace" = "MSOA11CD")) %>%
+  rename(cent_dest = centroid)
+
+  
+# coordinates for bb
+pts <- st_coordinates(msoa_centroids_snapped)
+# road network for routing
+net <- dodgr::dodgr_streetnet(pts = pts, expand = 0.1)
+# elevation data
+e <- raster::raster('../data/uk_elev.tif')
+# add slope column  - FOR LOOP VERY SLOWWW
+# for (i in 1:nrow(flows_ox2)){
+#   from <- flows_ox2$cent_orig[i]
+#   to <- flows_ox2$cent_dest[i]
+#   x <- st_geometry(stplanr::route_dodgr(from = from, to = to, net = net))
+#   flows_ox2$slope[i] <- slopes::slope_raster(x, e = uk_elev) 
+#   print(paste("Calculated slope", i, "out of", nrow(flows_ox2)))
+# }
+
+# ALTERNATIVELY 
+# 1. get geometries
+route <- function(df, elev, net){
+  nrows <- nrow(df)
+  i = 1:nrows
+  df$route = st_sfc(lapply(1:nrows, function(x) st_geometrycollection()))
+  st_crs(df$route) <- 4326
+  df$route[i] <- st_geometry(stplanr::route_dodgr(from = df$cent_orig[i], to = df$cent_dest[i], net = net))
+  return(df)
+}
+
+# 1. get slopes
+slope <- function(df, elev){
+  nrows <- nrow(df)
+  i = 1:nrows
+  df$slope[i] <- slopes::slope_raster(df$route[i], elev) 
+  return(df)
+}
+
+# get routes column then slope column
+flows_ox2 <- flows_ox2 %>% route(elev = uk_elev, net = net) %>% slope(elev = uk_elev)
+
+########### ELEVATION - REMOVE LATER - END
 
 ############
 # ROUTING USING DODGR
@@ -143,7 +209,9 @@ lon_lat <- msoa_centroids_snapped %>%
 #streetnet <- dodgr_streetnet (bbox = bb_ox) 
 ##########
 pts <- st_coordinates (lon_lat)
-streetnet <- dodgr_streetnet(pts = pts, expand = 0.05)
+streetnet <- dodgr_streetnet_sc(pts = pts, expand = 0.05)
+# add elevation to streetnet object. This is added to the vertices 
+streetnet <- osmdata::osm_elevation(streetnet, elev_file = c('../data-raw/UK_Elevation/uk_elev.tif'))
 
 graph <- weight_streetnet(streetnet, wt_profile = "bicycle")
 
@@ -193,6 +261,18 @@ graph$flow <- graph_undir$flow
 graph_f <- graph_f [graph_f$flow > 0, ]
 dodgr_flowmap (graph_f, linescale = 5)
 
+
+# Lets get the actual paths
+
+graph_p <- dodgr_paths(
+  graph,
+  from,
+  to,
+  vertices = TRUE,
+  pairwise = FALSE,
+  heap = "BHeap",
+  quiet = TRUE
+)
 
 
 

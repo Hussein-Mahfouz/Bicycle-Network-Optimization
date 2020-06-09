@@ -1,6 +1,7 @@
 library(tidyverse)
 library(sf)
 library(dodgr)
+library(raster)
 
 # read in MSOA centroids
 lon_lat <- read_csv('../data/msoa_lon_lat.csv') 
@@ -45,7 +46,22 @@ to <- colnames(od_flow_matrix) %>% as.data.frame() %>% left_join(lon_lat, by = c
 # bb_ldn <- bb_buffer(city = "london uk", buffer = 1000)
 # streetnet <- dodgr_streetnet(bbox = bb_ldn)    # `Error: vector memory exhausted (limit reached?)`
 
-streetnet <- dodgr_streetnet("london uk", expand = 0.05) # 217101 rows    # 1794.96 mb
+streetnet <- dodgr_streetnet_sc("london uk", expand = 0.05) # 217101 rows    # 1794.96 mb
+
+#### add elevation data - START
+
+#London is split between two tiles. we load both and then merge them
+uk_1 <- raster::raster('../data-raw/UK_Elevation/srtm_36_02.tif')
+uk_2 <- raster::raster('../data-raw/UK_Elevation/srtm_37_02.tif')
+#merge
+uk_elev <- raster::merge(uk_1, uk_2)
+# write to disk for osm_elevation function (need to pass file path...)
+writeRaster(uk_elev, '../data-raw/UK_Elevation/uk_elev.tif')
+# add elevation to streetnet object. This is added to the vertices 
+streetnet <- osmdata::osm_elevation(streetnet, elev_file = c('../data-raw/UK_Elevation/uk_elev.tif'))
+
+#### add elevation data - END
+
 graph <- weight_streetnet(streetnet, wt_profile = "bicycle")
 #OR IF IT IS SAVED
 #graph <- readRDS("../data/london_roads.Rds")
@@ -65,7 +81,6 @@ res <- dodgr_flows_aggregate(
           flows = od_flow_matrix,
           contract = TRUE,
           quiet = FALSE)
-
 
 
 

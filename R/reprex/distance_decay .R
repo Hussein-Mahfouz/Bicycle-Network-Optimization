@@ -12,6 +12,7 @@ flow <- pct::get_pct(region = "london", layer = "rf") %>%
 
 flow_sub <- flow
 
+flow <- pct::get_pct(region = "west-yorkshire", layer = "rf")
 ###### 1. GET THE DATA - END ######
 
 ##### 2. PREDICT CYCLING PROBABILITY - START #####
@@ -20,7 +21,7 @@ flow_sub <- flow
 #flow_sub$perc_cycle <- flow_sub$bicycle / flow_sub$all
 
 # group rows based on distance column. Change 'by' to edit number of groups
-flow_sub$distance_groups <- cut(flow_sub$dist, breaks = seq(from = 0, to = 50, by = 1))
+flow_sub$distance_groups <- cut(flow_sub$dist, breaks = seq(from = 0, to = 50, by = 0.5))
 #show
 flow_sub
 # group by distance categories created above and get summary stats
@@ -36,11 +37,11 @@ ggplot(flow_glm) +
   labs( x="Commuting Distance (km)", y = "Probability of Trip Being Cycled")
 
 # model to predict the distance group based on the % of commuters who cycle
-### OPTION 1 (part 1): use group as predictor. In this case all rows in the next step 
+### OPTION 1 (part 1): use distance_group as predictor. In this case all rows in the next step 
 #                  will have the same prob_cycle 
 glm1 <- glm(perc_cycle ~ distance_group, data = flow_glm, family = "quasibinomial")
-#OPTION 2 (part 1): use gdist as predictor. In this case all rows in the next step 
-#                  will have different prob_cycle 
+#OPTION 2 (part 1): use distance as predictor. In this case all rows in the next step 
+#                  will have different prob_cycle (because predictor is continuous)
 glm2 <- glm(perc_cycle ~ distance, data = flow_glm, family = "quasibinomial")
 
 # predict cycling probability on all OD pairs:

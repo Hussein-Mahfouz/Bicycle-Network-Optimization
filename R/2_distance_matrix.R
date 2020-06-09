@@ -4,7 +4,6 @@ library(sf)
 library(osmdata)
 library(lwgeom)
 library(pct)
-library(osmdata)
 
 ###############
 # IMPORTING SPATIAL DATA FOR ROUTING
@@ -81,10 +80,12 @@ msoa_centroids_snapped %>%
   rename(lon = X, lat = Y) %>%  # rename x and y
   select(-c(geo_name)) %>% 
   write_csv(path = "../data/msoa_lon_lat.csv")
-  
+  #st_write( "../data/msoa_lon_lat.shp")
+# SAVE AS .shp YOU IDIOT
+
 # read it in for dodgr_dist calculations (below)
 msoa_lon_lat <- read_csv("../data/msoa_lon_lat.csv") %>% as.data.frame() %>%
-  select(c(lon, lat))        
+  dplyr::select(c(lon, lat))        
 
 ############
 # DISTANCE MATRIX USING DODGR
@@ -131,7 +132,53 @@ flows_london <- readr::read_csv("../data/flows_london.csv")
 flows_london %>% subset(select = -c(city_origin, city_dest)) %>%
    left_join(dist_mat, by = c("Area of residence" = "from" , "Area of workplace" = "to")) %>%
    write_csv(path = "../data/flows_dist_for_potential_flow.csv")
-  
+
+flows_slope <- flows_london %>% subset(select = -c(city_origin, city_dest)) %>%
+  left_join(dist_mat, by = c("Area of residence" = "from" , "Area of workplace" = "to"))
+
+
+##### ADD SLOPE - START
+# flows_slope <- flows_slope %>% left_join(msoa_centroids_snapped[,c('MSOA11CD' ,'centroid')],
+#                                     by = c("Area of residence" = "MSOA11CD")) %>%
+#   rename(cent_orig = centroid) 
+# 
+# flows_slope <- flows_slope %>% left_join(msoa_centroids_snapped[,c('MSOA11CD' ,'centroid')],
+#                                      by = c("Area of workplace" = "MSOA11CD")) %>%
+#   rename(cent_dest = centroid)
+# 
+# # coordinates for bb
+# pts <- st_coordinates(msoa_centroids_snapped)
+# # road network for routing
+# net <- dodgr::dodgr_streetnet(pts = pts, expand = 0.1)
+# # elevation data
+# uk_elev <- raster::raster('../data/uk_elev.tif')
+# 
+# # 1. get geometries
+# route <- function(df, net){
+#   nrows <- nrow(df)
+#   i = 1:nrows
+#   df$route = st_sfc(lapply(1:nrows, function(x) st_geometrycollection()))
+#   st_crs(df$route) <- 4326
+#   df$route[i] <- st_geometry(stplanr::route_dodgr(from = df$cent_orig[i], to = df$cent_dest[i], net = net))
+#   return(df)
+# }
+# 
+# # 1. get slopes
+# slope <- function(df, elev){
+#   nrows <- nrow(df)
+#   i = 1:nrows
+#   df$slope[i] <- slopes::slope_raster(df$route[i], elev) 
+#   return(df)
+# }
+# 
+# # get routes column then slope column
+# flows_slope <- flows_slope %>% route(elev = uk_elev, net = net) %>% slope(elev = uk_elev)
+# 
+# flows_slope %>% write_csv(path = "../data/flows_dist_elev_for_potential_flow.csv")
+
+##### ADD SLOPE - END
+
+
 
 ##########
 # GETTING SF STRAIGHT LINE DISTANCES TO COMPARE WITH RESULTS

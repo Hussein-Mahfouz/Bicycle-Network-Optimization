@@ -9,7 +9,7 @@ flows_internal <- function(name) {
 
 # function to filter MSOAs that are within a certain city
 # only runs on the city_names dataframe in '1_flow_data'
-msoas_city <- function(name) {
+msoas_in_city <- function(name) {
   x <- city_names %>% filter(city == name)
   return(x)
 }
