@@ -97,11 +97,26 @@ pts <- st_coordinates (msoa_centroids_snapped)
 #silicate format: penalizes intersections and hilliness
 streetnet_sc <- dodgr_streetnet_sc(pts = pts, expand = 0.05)
 
+# add elevation data to sc object
+# #London is split between two tiles. we load both and then merge them
+# uk_1 <- raster::raster('../data-raw/UK_Elevation/srtm_36_02.tif')
+# uk_2 <- raster::raster('../data-raw/UK_Elevation/srtm_37_02.tif')
+# #merge
+# uk_elev <- raster::merge(uk_1, uk_2)
+# # write to disk for osm_elevation function (need to pass file path...)
+# writeRaster(uk_elev, '../data/uk_elev.tif')
+# # we only need the merged one
+# rm(uk_1, uk_2, uk_elev)
+
+# add the elevation data to the vertices
+streetnet_sc <- osmdata::osm_elevation(streetnet_sc, elev_file = c('../data/uk_elev.tif'))
+
 # make graph for routing
 graph <- weight_streetnet(streetnet_sc, wt_profile = "bicycle")
 
 # SAVE TO LOAD IN NEXT TIME!
-saveRDS (graph, file = "../data/alt_city/city_graph.Rds")
+saveRDS(graph, file = "../data/alt_city/city_graph.Rds")
+
 
 # contract graph for faster routing
 graph_contracted <- dodgr_contract_graph(graph)
@@ -140,21 +155,10 @@ flows_slope <- flows_slope %>% left_join(msoa_centroids_snapped[,c('msoa11cd' ,'
 
 # coordinates for bb
 #pts <- st_coordinates(msoa_centroids_snapped)
-# road network for routing
+# road network for routing (cannot use streetnet_sc from above as stplanr function only takes sf)
 net <- dodgr::dodgr_streetnet(pts = pts, expand = 0.1)
 
-# ###### ELEVATION DATA - START
-# #London is split between two tiles. we load both and then merge them
-# uk_1 <- raster::raster('../data-raw/UK_Elevation/srtm_36_02.tif')
-# uk_2 <- raster::raster('../data-raw/UK_Elevation/srtm_37_02.tif')
-# #merge
-# uk_elev <- raster::merge(uk_1, uk_2)
-# # write to disk for osm_elevation function (need to pass file path...)
-# writeRaster(uk_elev, '../data/uk_elev.tif')
-# # we only need the merged one
-# rm(uk_1, uk_2, uk_elev)
-# ###### ELEVATION DATA - END
-# elevation data
+# load in elevation data
 uk_elev <- raster::raster('../data/uk_elev.tif')
 
 # 1. get geometries
@@ -169,7 +173,7 @@ route <- function(df, net){
   return(df)
 }
 
-# 1. get slopes
+# 2. get slopes
 slope <- function(df, elev){
   nrows <- nrow(df)
   i = 1:nrows
@@ -178,7 +182,7 @@ slope <- function(df, elev){
   return(df)
 }
 
-# get routes column then slope column
+# get routes column then slope column (function 1 then function 2)
 flows_slope <- flows_slope %>% route(net = net) %>% slope(elev = uk_elev)
 
 flows_slope %>% 

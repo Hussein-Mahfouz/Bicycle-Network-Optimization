@@ -1,3 +1,6 @@
+library(sf)
+
+
 # convert to sf
 graph_sf <- graph_undir %>% dodgr_to_sf()
 graph_sf$flow_normalized <- graph_sf$flow / graph_sf$d_weighted

@@ -91,7 +91,7 @@ uptake_no_intra <- uptake_decay %>% dplyr::filter(`Area of residence` != `Area o
 # LOGIT
 #glm1 <- glm(perc_cycle ~ dist + slope, data = uptake_no_intra, family = "quasibinomial")
 #glm1 <- glm(perc_cycle ~ dist + slope, data = uptake_decay, family = "quasibinomial")
-# sqrt to get bell shape!
+# sqrt to get bell shape!  https://itsleeds.github.io/pct/reference/uptake_pct_govtarget.html
 glm1 <- glm(perc_cycle ~ dist + sqrt(dist) + slope, data = uptake_no_intra, family = "quasibinomial")
 
 # If coefficient (logit) is positive, the effect of this predictor on cycling is positive and vice versa
