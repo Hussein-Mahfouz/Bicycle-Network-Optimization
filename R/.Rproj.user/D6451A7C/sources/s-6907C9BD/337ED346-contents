@@ -1,37 +1,259 @@
 library(tidyverse)
 library(stplanr)
+library(pct)
 
 # read in the data
 flow <- readr::read_csv("../data/alt_city/flows_dist_elev_for_potential_flow.csv")
-# replace NA slope values with 0
-flow$slope[is.na(flow$slope)] <- 0
+# replace NA values with the mean slope
+flow$slope[is.na(flow$slope)] <- mean(na.omit(flow$slope))
+
 ###############
-# OPTION 1: Use a distance decay function from stplanr https://itsleeds.github.io/pct/reference/uptake_pct_godutch.html
+# OPTION 1: Use a distance decay function from pct package https://itsleeds.github.io/pct/reference/uptake_pct_godutch.html
 ###############
 
 # create a copy of the df 
-demand_decay <- flow
+uptake_pct <- flow
 
 # get % increase in cycling as distance decay 
-demand_decay$uptake_dutch = pct::uptake_pct_godutch(distance = demand_decay$dist, gradient = demand_decay$slope)
+uptake_pct$uptake_dutch = pct::uptake_pct_godutch(distance = uptake_pct$dist, gradient = uptake_pct$slope)
+
+# ggplot(uptake_pct) +
+#   geom_point(aes(dist, uptake_dutch)) + 
+#   labs( x="Commuting Distance (km)", y = "Uptake (%)")
 
 # get potential demand: non-active flow*uptake + active flow
-demand_decay <- demand_decay %>% 
+uptake_pct <- uptake_pct %>% 
   # get current active travel
   mutate(active_travel = Bicycle + `On foot`) %>% 
   # get potential active travel: non-active modes * distance decay parameter
   mutate(potential_demand = round((`All categories: Method of travel to work` - active_travel) * uptake_dutch) + active_travel) 
 
 # save csv to use in '4_aggregating_flows'
-demand_decay %>% 
+uptake_pct %>% 
   subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
   write_csv(path = "../data/alt_city/flows_for_aggregated_routing_opt_1.csv")
 
 # all number should be above 0. Cycling should not be more than toal trips...
-demand_decay$increase = demand_decay$`All categories: Method of travel to work` - demand_decay$potential_demand
+uptake_pct$increase = uptake_pct$`All categories: Method of travel to work` - uptake_pct$potential_demand
 
 # remove
-rm(demand_decay)
+rm(uptake_pct)
+###############
+
+###############
+# OPTION 2: without distance decay
+###############
+
+# function that takes the following arguments
+# 1. dataframe to be used
+# 2. max_dist: cutoff distance in meters. All OD pairs above this distance are assumed to have 0 potential demand
+# 3. public: fraction of public transport flow that should be considered potential cycling demand
+# 4. private: fraction of private vehicle flow that should be considered potential cycling demand
+# 3 & 4 are 0 if distance between MSOA pair > max_dist
+# 3 & 4 are added to current bicycle trips to create a potential demand column
+# Walking is not added to potential demand
+
+potential_demand <- function(data, max_dist = 6000, public = 0.2, private = 0.5) {
+   name <- data %>%
+     mutate(active = Bicycle + `On foot`) %>%
+     mutate(sustainable = (`Underground, metro, light rail, tram` + Train + `Bus, minibus or coach`)) %>%
+     mutate(motor = (`All categories: Method of travel to work` - (sustainable + active))) %>%
+     mutate(potential_demand = if_else(dist <= max_dist, round(Bicycle + sustainable*public + motor*private), Bicycle))
+    return(name)
+ }
+
+# use function to get potential demand
+uptake_cutoff <- potential_demand(data=flow)
+# save as csv
+uptake_cutoff %>% 
+  subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
+  write_csv(path = "../data/alt_city/flows_for_aggregated_routing_opt_2.csv")
+
+rm(uptake_cutoff)
+###############
+
+
+
+###############
+# OPTION 3: my own distance decay function
+###############
+
+uptake_decay <- flow
+# get % of cyclists
+uptake_decay$perc_cycle <- uptake_decay$Bicycle / uptake_decay$`All categories: Method of travel to work`
+# use this df for glm, as intra flows are all assigned distance 0 and so affect the results
+uptake_no_intra <- uptake_decay %>% dplyr::filter(`Area of residence` != `Area of workplace`)
+
+# CHANGE NA VALUES TO 0 - REVIEW THIS LATER, COULD CHANGE THEM TO MEAN/MAX
+#uptake_decay$dist[is.na(uptake_decay$dist)] <- 0
+
+
+# LOGIT
+#glm1 <- glm(perc_cycle ~ dist + slope, data = uptake_no_intra, family = "quasibinomial")
+#glm1 <- glm(perc_cycle ~ dist + slope, data = uptake_decay, family = "quasibinomial")
+# sqrt to get bell shape!
+glm1 <- glm(perc_cycle ~ dist + sqrt(dist) + slope, data = uptake_no_intra, family = "quasibinomial")
+
+# If coefficient (logit) is positive, the effect of this predictor on cycling is positive and vice versa
+#coeff <- coef(glm1) %>% as.data.frame() 
+summary(glm1)
+# predict cycling probability on all OD pairs
+uptake_decay$prob_cycle <- predict(glm1, data.frame(dist = uptake_decay$dist, slope = uptake_decay$slope), type = "response")
+
+# get goodness of fit
+rsq  <- function(observed,estimated){
+  r <- cor(observed,estimated)
+  R2 <- r^2
+  R2
+}
+rsq(uptake_decay$perc_cycle,uptake_decay$prob_cycle)
+#rsq(uptake_no_intra$perc_cycle, uptake_no_intra$prob_cycle)
+
+ggplot(uptake_decay) +
+  geom_point(aes(perc_cycle, prob_cycle))
+
+# show probabilty of cycling vs distance
+ggplot(uptake_decay) +
+  geom_point(aes(dist, prob_cycle), color = 'green') +
+  geom_point(aes(dist, perc_cycle), color = "red") +
+  labs( x="Commuting Distance (km)", y = "Uptake (%)")
+  
+
+## DISTRIBUTE ADDITIONAL FLOWS ##
+
+# what is the current proportion of cyclists
+cycle_current <- sum(uptake_decay$Bicycle) / sum(uptake_decay$`All categories: Method of travel to work`)
+# Let's assume we want cycling mode share to increase to 40%
+cycle_target <- 0.4
+# no. of additional cycling trips needed to acheive target
+cycle_add <- round((cycle_target * sum(uptake_decay$`All categories: Method of travel to work`)) - sum(uptake_decay$Bicycle))
+
+####### 3a. FOR OPTION 1 - START #######
+# this column is the pool out of which some fraction will be converted to cyclists
+uptake_decay$non_active <- uptake_decay$`All categories: Method of travel to work` - (uptake_decay$Bicycle + uptake_decay$`On foot`)
+
+# this would be the additional number of cyclists if we did not have a target to calibrate to
+# it is basically the probability from the glm * non_active commuters
+uptake_decay$cycle_added_unweighted <- uptake_decay$prob_cycle * uptake_decay$non_active
+
+# But we need to adjust these values so that the additional cyclists = cycle_add
+# We solve for X (multiply_factor):
+# the idea is that cycle_added_unweighted(1)*X + cycle_added_unweighted(2) *X ..... = Additional Cycling Trips (cycle_add)
+multiply_factor <- cycle_add / sum(uptake_decay$cycle_added_unweighted)
+# Get the additional number of trips for each OD pair using multiplication factor found above
+uptake_decay$cycling_increase <- (uptake_decay$cycle_added_unweighted) * multiply_factor
+# Add additional trips to current trips to get future demand
+uptake_decay$potential_demand <- round(uptake_decay$cycling_increase) + uptake_decay$Bicycle
+
+# lets see if any of the potential demand values are above the total flow
+uptake_decay$cycle_fraction = uptake_decay$potential_demand / uptake_decay$`All categories: Method of travel to work`
+# Ideally, all values should be between 0 and 1
+max(uptake_decay$cycle_fraction) 
+min(uptake_decay$cycle_fraction) 
+
+# mode share of potential_deand column should = cycle_target
+sum(uptake_decay$potential_demand) / sum(uptake_decay$`All categories: Method of travel to work`)
+
+# Show how the number of additional cyclists has been distributed
+ggplot(uptake_decay) +
+  geom_smooth(aes(dist, potential_demand), color = 'green') +
+  geom_smooth(aes(dist, Bicycle), color = "red") +
+  labs( x="Commuting Distance (km)", y = "No. of Cyclists")
+
+#save csv
+uptake_decay %>% 
+  subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
+  write_csv(path = "../data/alt_city/flows_for_aggregated_routing_opt_3.csv")
+
+rm(cycle_add, cycle_current, cycle_target, multiply_factor, uptake_decay, uptake_no_intra, glm1,
+   rsq, potential_demand)
+
+
+
+
+
+######## 
+# PLOTTING DISTANCE VS FLOW
+########
+#plot distance vs flow
+# remove intra flows
+flow_plot <- flow %>% dplyr::filter(`Area of residence` != `Area of workplace`)
+
+# all motorized trips
+flow_plot$motor <- flow_plot$`Underground, metro, light rail, tram` + flow_plot$Train +
+  flow_plot$`Bus, minibus or coach` + flow_plot$Taxi + flow_plot$`Motorcycle, scooter or moped` + 
+  flow_plot$`Driving a car or van` + flow_plot$`Passenger in a car or van`
+
+# all non_motorized trips
+flow_plot$active <- flow_plot$Bicycle + flow_plot$`On foot` 
+
+# all trips by public transport or acyive modes
+flow_plot$sustainable <- flow_plot$active + flow_plot$`Underground, metro, light rail, tram` + 
+  flow_plot$Train + flow_plot$`Bus, minibus or coach` 
+
+# all trips by private vehicles
+flow_plot$private <- flow_plot$Taxi + flow_plot$`Motorcycle, scooter or moped` + 
+  flow_plot$`Driving a car or van` + flow_plot$`Passenger in a car or van` 
+
+# subset for histograms
+flow_plot <- flow_plot %>% dplyr::select(`Area of residence`, `Area of workplace`, 
+                                `All categories: Method of travel to work`, 
+                                Bicycle, motor, active, sustainable, private, dist)
+
+# repeat each row based on the value in Bicycle (for histogram!)
+flow_long_bike <- flow_plot %>% tidyr::uncount(Bicycle) %>%
+  dplyr::select(`Area of residence`, `Area of workplace`, dist)
+
+ggplot(flow_long_bike, aes(x = dist)) + 
+  geom_histogram(color = "black", alpha = 0.5, binwidth = 250) +
+  labs(title = "Bicycle Trips", x="Commuting Distance (km)", y = "No. of trips")
+
+###
+flow_long_motor <- flow_plot %>% tidyr::uncount(motor) %>%
+  dplyr::select(`Area of residence`, `Area of workplace`, dist)
+
+ggplot(flow_long_motor, aes(x = dist)) + 
+  geom_histogram(color = "black", alpha = 0.5) +
+  labs(title = "All Motorized Trips", x="Commuting Distance (km)", y = "No. of trips")
+
+### 
+flow_long_active <- flow_plot %>% tidyr::uncount(active) %>%
+  dplyr::select(`Area of residence`, `Area of workplace`, dist)
+
+ggplot(flow_long_active, aes(x = dist)) + 
+  geom_histogram(color = "black", alpha = 0.5) +
+  labs(title = "Active Trips", x="Commuting Distance (km)", y = "No. of trips")
+
+### 
+flow_long_sustainable <- flow_plot %>% tidyr::uncount(sustainable) %>%
+  dplyr::select(`Area of residence`, `Area of workplace`, dist)
+
+ggplot(flow_long_sustainable, aes(x = dist)) + 
+  geom_histogram(color = "black", alpha = 0.5) +
+  labs(title = "Trips Made by Sustainable Modes", 
+       x="Commuting Distance (km)", y = "No. of trips")
+
+### 
+flow_long_private <- flow_plot %>% tidyr::uncount(private) %>%
+  dplyr::select(`Area of residence`, `Area of workplace`, dist)
+
+ggplot(flow_long_private, aes(x = dist)) + 
+  geom_histogram(color = "black", alpha = 0.5) +
+  labs(title = "Trips Made by Private Vehicles", 
+       x="Commuting Distance (km)", y = "No. of trips")
+
+# to plot different histograms together
+histogram<- rbind(flow_long_motor, flow_long_bike, flow_long_sustainable)
+
+ggplot(histogram, aes(x=dist)) + 
+  geom_histogram(data=flow_long_motor, fill = "blue", alpha = 0.9) +
+  geom_histogram(data=flow_long_sustainable, fill = "red", alpha = 0.5) +
+  geom_histogram(data= flow_long_bike, fill = "green", alpha = 0.5) 
+
+rm(flow, flow_plot, flow_long_active, flow_long_bike, flow_long_motor, flow_long_private, flow_long_sustainable,
+   histogram)
+########
+
 
 
 
