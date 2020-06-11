@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591894094879.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "DB02626C",
+    "lastKnownWriteTime" : 1591913278,
+    "last_content_update" : 1591913278384,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/exploring_osm_labels.R",
+    "project_path" : "exploring_osm_labels.R",
+    "properties" : {
+        "cursorPosition" : "10,45",
+        "scrollLine" : "2",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

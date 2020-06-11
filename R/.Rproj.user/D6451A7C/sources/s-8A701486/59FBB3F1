@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591913505569.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "59FBB3F1",
+    "lastKnownWriteTime" : 4348584477,
+    "last_content_update" : 1591913505569,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "16274323",
+        "caption" : "streetnet",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=streetnet&cache_key=16274323",
+        "displayedObservations" : 54964,
+        "environment" : "",
+        "expression" : "streetnet",
+        "object" : "streetnet",
+        "preview" : 0,
+        "totalObservations" : 54964,
+        "variables" : 278
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
