@@ -33,7 +33,7 @@ flows_internal <- function(name) {
 }
 
 # use function to get flows between all MSOAs in city. Remove pairs with total flow < 10
-flows_city <- flows_internal("Oxford") %>% 
+flows_city <- flows_internal("Manchester") %>% 
   dplyr::filter(`All categories: Method of travel to work` > 10) 
 
 # save as csv to use in next step

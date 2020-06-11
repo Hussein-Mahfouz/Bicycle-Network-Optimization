@@ -79,13 +79,17 @@ rm(uptake_cutoff)
 ###############
 
 uptake_decay <- flow
+# What to do with dist= NA
+#1. Remove these rows
+uptake_decay <- uptake_decay %>% subset(!is.na(dist))
+# 2.replace NA values by column mean 
+#uptake_decay$dist[is.na(uptake_decay$dist)] <- max(uptake_decay$dist[!is.na(uptake_decay$dist)])
+
+
 # get % of cyclists
 uptake_decay$perc_cycle <- uptake_decay$Bicycle / uptake_decay$`All categories: Method of travel to work`
 # use this df for glm, as intra flows are all assigned distance 0 and so affect the results
 uptake_no_intra <- uptake_decay %>% dplyr::filter(`Area of residence` != `Area of workplace`)
-
-# CHANGE NA VALUES TO 0 - REVIEW THIS LATER, COULD CHANGE THEM TO MEAN/MAX
-#uptake_decay$dist[is.na(uptake_decay$dist)] <- 0
 
 
 # LOGIT
@@ -93,12 +97,19 @@ uptake_no_intra <- uptake_decay %>% dplyr::filter(`Area of residence` != `Area o
 #glm1 <- glm(perc_cycle ~ dist + slope, data = uptake_decay, family = "quasibinomial")
 # sqrt to get bell shape!  https://itsleeds.github.io/pct/reference/uptake_pct_govtarget.html
 glm1 <- glm(perc_cycle ~ dist + sqrt(dist) + slope, data = uptake_no_intra, family = "quasibinomial")
+# add destination zone as proxy for employment/population of MSOA
+# glm2 <- glm(perc_cycle ~ dist + sqrt(dist) + slope + `Area of workplace`,
+#             data = uptake_no_intra, family = "quasibinomial")
 
 # If coefficient (logit) is positive, the effect of this predictor on cycling is positive and vice versa
 #coeff <- coef(glm1) %>% as.data.frame() 
 summary(glm1)
+#summary(glm2)
 # predict cycling probability on all OD pairs
 uptake_decay$prob_cycle <- predict(glm1, data.frame(dist = uptake_decay$dist, slope = uptake_decay$slope), type = "response")
+# uptake_decay$prob_cycle <- predict(glm2, data.frame(dist = uptake_decay$dist, slope = uptake_decay$slope,
+#                                                     `Area of workplace` = uptake_decay$`Area of workplace`), 
+#                                    type = "response")
 
 # get goodness of fit
 rsq  <- function(observed,estimated){
@@ -123,8 +134,8 @@ ggplot(uptake_decay) +
 
 # what is the current proportion of cyclists
 cycle_current <- sum(uptake_decay$Bicycle) / sum(uptake_decay$`All categories: Method of travel to work`)
-# Let's assume we want cycling mode share to increase to 40%
-cycle_target <- 0.4
+# Let's assume we want cycling mode share to increase to 20%
+cycle_target <- 0.2
 # no. of additional cycling trips needed to acheive target
 cycle_add <- round((cycle_target * sum(uptake_decay$`All categories: Method of travel to work`)) - sum(uptake_decay$Bicycle))
 
@@ -158,7 +169,14 @@ sum(uptake_decay$potential_demand) / sum(uptake_decay$`All categories: Method of
 ggplot(uptake_decay) +
   geom_smooth(aes(dist, potential_demand), color = 'green') +
   geom_smooth(aes(dist, Bicycle), color = "red") +
-  labs( x="Commuting Distance (km)", y = "No. of Cyclists")
+  labs( x="Commuting Distance (m)", y = "No. of Cyclists")
+
+# show the cycling mode share vs distance
+ggplot(uptake_decay) +
+  geom_smooth(aes(dist, perc_cycle), color = 'red') + # old mode share
+  geom_smooth(aes(dist, cycle_fraction), color = "green") + # new mode share
+  labs( x="Commuting Distance (m)", y = "Cycling Mode Share (%)")
+
 
 #save csv
 uptake_decay %>% 

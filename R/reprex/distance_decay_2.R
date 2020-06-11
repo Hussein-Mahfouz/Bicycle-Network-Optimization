@@ -4,15 +4,17 @@ library(sf)
 
 ###### 1. GET THE DATA - START ######
 flow <- pct::get_pct(region = "london", layer = "rf")
-# save it for next time
-write_csv(flow, path = "reprex/flows_london_decay.csv")
 ###### 1. GET THE DATA - END ######
 
+###### 2. PROBABILITY OF CYCLING (GLM) - START ######
 #copy the data to another df and keep only the necessary columns
 uptake_decay <- flow %>% 
   st_drop_geometry %>%
   dplyr::select(geo_code1, geo_code2, all, bicycle, foot, rf_dist_km, rf_avslope_perc) %>%
   rename(dist = rf_dist_km, slope = rf_avslope_perc)
+# save it for next time
+write_csv(uptake_decay, path = "reprex/flows_london_decay.csv")
+
 # get % of cyclists
 uptake_decay$perc_cycle <- uptake_decay$bicycle / uptake_decay$all
 # use this df for glm, as intra flows are all assigned distance 0 and so affect the results
@@ -41,8 +43,9 @@ rsq  <- function(observed,estimated){
 
 rsq(uptake_decay$perc_cycle,uptake_decay$prob_cycle)
 
+###### 2. PROBABILITY OF CYCLING (GLM) - END ######
 
-## DISTRIBUTE ADDITIONAL FLOWS ##
+###### 3. DISTRIBUTE ADDITIONAL FLOWS - START ######
 
 # what is the current proportion of cyclists
 cycle_current <- sum(uptake_decay$bicycle) / sum(uptake_decay$all)
@@ -51,7 +54,6 @@ cycle_target <- 0.2
 # no. of additional cycling trips needed to acheive target
 cycle_add <- round((cycle_target * sum(uptake_decay$all)) - sum(uptake_decay$bicycle))
 
-####### 3a. FOR OPTION 1 - START #######
 # this column is the pool out of which some fraction will be converted to cyclists
 uptake_decay$non_active <- uptake_decay$all - (uptake_decay$bicycle + uptake_decay$foot)
 
@@ -74,14 +76,25 @@ uptake_decay$cycle_fraction = uptake_decay$potential_demand / uptake_decay$all
 max(uptake_decay$cycle_fraction) 
 min(uptake_decay$cycle_fraction) 
 
-# mode share of potential_deand column should = cycle_target (20%)
+# mode share of potential_demand column should = cycle_target (20%)
 sum(uptake_decay$potential_demand) / sum(uptake_decay$all)
+
+###### 3. DISTRIBUTE ADDITIONAL FLOWS - END ######
+
+###### 4. VISUALIING RESULTS ######
 
 # Show how the number of additional cyclists has been distributed
 ggplot(uptake_decay) +
   geom_smooth(aes(dist, potential_demand), color = 'green') +
   geom_smooth(aes(dist, bicycle), color = "red") +
   labs( x="Commuting Distance (km)", y = "No. of Cyclists")
+
+# show the cycling mode share vs distance
+ggplot(uptake_decay) +
+  geom_smooth(aes(dist, perc_cycle), color = 'red') + # old mode share
+  geom_smooth(aes(dist, cycle_fraction), color = "green") + # new mode share
+  labs( x="Commuting Distance (km)", y = "Cycling Mode Share (%)")
+
 
 
 

@@ -15,7 +15,7 @@ msoas_in_city <- function(df, city_name) {
   return(x)
 }
 # get MSOAs in city
-msoas_city <- msoas_in_city(city_names, "Oxford")
+msoas_city <- msoas_in_city(city_names, "Manchester")
 
 # get population weighted centroids from pct and change crs (default is northing)
 msoa_centroids <- pct::get_centroids_ew() %>% st_transform(4326)
@@ -80,7 +80,7 @@ msoa_centroids_snapped %>%
   cbind(st_coordinates(.)) %>%  #split geometry into X and Y columns
   rename(lon = X, lat = Y) %>%  # rename x and y
   dplyr::select(-c(msoa11nm)) %>% 
-  st_write("../data/alt_city/msoa_lon_lat.shp") # save as shp file
+  st_write("../data/alt_city/msoa_lon_lat.shp", append=FALSE) # save as shp file. append=FALSE to overwrite existing layer
 
 
 # read it in for dodgr_dist calculations (below)

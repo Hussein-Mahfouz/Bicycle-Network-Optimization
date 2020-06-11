@@ -1,6 +1,6 @@
 library(sf)
 
-graph_sf <- st_read("../data/alt_city/graph_with_flows.geojson")
+graph_sf <- readRDS("../data/alt_city/graph_with_flows.RDS")
 # column to prioritize by. Change later
 graph_sf$flow_normalized <- graph_sf$flow / graph_sf$d_weighted
 
@@ -131,3 +131,36 @@ growth2 <- function(graph, km, col_name) {
 test2 <- growth2(graph_sf, 50, "flow_normalized")
 plot(st_geometry(test2))
 plot(test2["sequence"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Understanging OSM
+
+cycle <- graph_sf %>% dplyr::filter(highway == 'cycleway')
+no_cycle <- graph_sf %>% dplyr::filter(highway != 'cycleway')
+
+plot(st_geometry(no_cycle))
+plot(st_geometry(cycle), add = TRUE, col = 'red')
+int <- st_intersection(no_cycle, cycle)
+plot(st_geometry(int))
+
+int <- st_intersection(graph_sf, cycle)
+
+weight_profiles <-dodgr::weighting_profiles$weighting_profiles %>% 
+  filter(name == 'bicycle')
+
+x <- graph_sf %>% group_by(highway) %>% 
+  summarize(segments=n(), `length (m)` = sum(d))
+plot(st_geometry(x[8,]))
+
+plot(x["highway"])

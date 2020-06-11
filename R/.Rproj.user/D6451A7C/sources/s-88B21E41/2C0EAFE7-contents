@@ -6,7 +6,7 @@ library(dodgr)
 # read in MSOA centroids
 lon_lat <- st_read('../data/alt_city/msoa_lon_lat.shp') 
 # flow data: there are 3 files (check script 3 and choose 1)
-od_flow <- read_csv('../data/alt_city/flows_for_aggregated_routing_opt_1.csv') 
+od_flow <- read_csv('../data/alt_city/flows_for_aggregated_routing_opt_3.csv') 
 
 # remove flows where ORIGIN = DESTINATION
 od_flow <- od_flow %>% filter(`Area of residence` != `Area of workplace`)
@@ -57,8 +57,9 @@ graph_undir <- dodgr::merge_directed_flows(graph_flows)
 # convert to sf for prioritixing segments. 
 # Notice that the segments are merged (much less than graph_flows)
 graph_sf <- graph_undir %>% dodgr_to_sf()
-# save as geojson
-st_write(graph_sf, "../data/alt_city/graph_with_flows.geojson") 
+
+# save as RDS to load in next script (geojson, shp etc cause problems)
+saveRDS(graph_sf, file = "../data/alt_city/graph_with_flows.Rds")
 
 rm(from, graph, graph_flows, graph_sf, graph_undir, lon_lat, od_flow, od_flow_matrix, to)
 
