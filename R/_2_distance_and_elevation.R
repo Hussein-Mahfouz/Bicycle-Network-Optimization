@@ -14,8 +14,8 @@ msoas_in_city <- function(df, city_name) {
   x <- df %>% filter(city == city_name)
   return(x)
 }
-# get MSOAs in city
-msoas_city <- msoas_in_city(city_names, "Manchester")
+# get MSOAs in chosen_city. chosen_city is chosen in script 1
+msoas_city <- msoas_in_city(city_names, chosen_city)
 
 # get population weighted centroids from pct and change crs (default is northing)
 msoa_centroids <- pct::get_centroids_ew() %>% st_transform(4326)

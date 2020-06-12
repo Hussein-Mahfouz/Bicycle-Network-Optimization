@@ -80,4 +80,3 @@ plot(st_geometry(bicycle_designated))
 plot(st_geometry(lane_not_cycleway), add = TRUE, col = 'red')
 
 
-

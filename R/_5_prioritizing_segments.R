@@ -84,7 +84,7 @@ growth <- function(graph, segments, col_name) {
 }
 
 # check it
-test <- growth(graph_sf, 50, "flow_normalized")
+test <- growth(graph_sf, 75, "flow_normalized")
 plot(st_geometry(test))
 plot(test["sequence"])
 
@@ -128,10 +128,9 @@ growth2 <- function(graph, km, col_name) {
 }
 
 # check it
-test2 <- growth2(graph_sf, 50, "flow_normalized")
+test2 <- growth2(graph_sf, 75, "flow_normalized")
 plot(st_geometry(test2))
 plot(test2["sequence"])
-
 
 
 

@@ -96,6 +96,7 @@ uptake_no_intra <- uptake_decay %>% dplyr::filter(`Area of residence` != `Area o
 #glm1 <- glm(perc_cycle ~ dist + slope, data = uptake_no_intra, family = "quasibinomial")
 #glm1 <- glm(perc_cycle ~ dist + slope, data = uptake_decay, family = "quasibinomial")
 # sqrt to get bell shape!  https://itsleeds.github.io/pct/reference/uptake_pct_govtarget.html
+# Should I add all_travel as a predictor???
 glm1 <- glm(perc_cycle ~ dist + sqrt(dist) + slope, data = uptake_no_intra, family = "quasibinomial")
 # add destination zone as proxy for employment/population of MSOA
 # glm2 <- glm(perc_cycle ~ dist + sqrt(dist) + slope + `Area of workplace`,

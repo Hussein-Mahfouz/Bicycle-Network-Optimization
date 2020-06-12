@@ -42,6 +42,21 @@ to <- colnames(od_flow_matrix) %>% as.data.frame() %>% left_join(lon_lat, by = c
 # load in graph save in script 2
 graph <- readRDS('../data/alt_city/city_graph.Rds')
 
+######
+# THIS GRAPH HAS THE DEFAULT WEIGHTING PROFILES (so Trunk = 0.3). I will change these:
+
+# library(jsonlite)
+# dodgr::write_dodgr_wt_profile(file = "x")
+# json_data <- jsonlite::fromJSON(txt="x.json")
+# json_data$weighting_profiles$name == 'bicycle' 
+# get specific row to edit
+# json_data$weighting_profiles$name == 'bicycle' & json_data$weighting_profiles$way == 'trunk'
+
+# TO DO THIS I SHOULD EITHER:
+# Do this in script 2 (Makes the most sense)
+# load streetnet here and edit weighting profiles (discard Rds loaded above)
+######
+
 # add flows to road segments
 graph_flows <- dodgr_flows_aggregate(
                   graph = graph,
@@ -62,5 +77,13 @@ graph_sf <- graph_undir %>% dodgr_to_sf()
 saveRDS(graph_sf, file = "../data/alt_city/graph_with_flows.Rds")
 
 rm(from, graph, graph_flows, graph_sf, graph_undir, lon_lat, od_flow, od_flow_matrix, to)
+
+
+
+
+
+
+
+
 
 
