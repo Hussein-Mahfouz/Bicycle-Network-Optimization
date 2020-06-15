@@ -2,7 +2,7 @@ library(sf)
 
 graph_sf <- readRDS("../data/alt_city/graph_with_flows.RDS")
 # column to prioritize by. Change later
-graph_sf$flow_normalized <- graph_sf$flow / graph_sf$d_weighted
+#graph_sf$flow_normalized <- graph_sf$flow / graph_sf$d_weighted
 
 ######
 #GROWING A NETWORK
@@ -11,12 +11,16 @@ graph_sf$flow_normalized <- graph_sf$flow / graph_sf$d_weighted
 # copy of graph to edit
 x <- graph_sf
 #get edge_id of edge with highest flow
-edge_sel <- x$edge_id[which.max(x$flow_normalized)]
+edge_sel <- x$edge_id[which.max(x$flow)]
 # prepare row for adding to new df
 x <- x %>% filter(edge_id == edge_sel) %>% 
   mutate(sequence= 0)
+# we don't want to include edges that already have cycling infrastructure in the iterator
+# because they won't cost anything
+if (x$cycle_infra == 0) {
+  i <- 1} else {
+    i <- 0}
 
-i <- 1
 while (i < 50){
   
   # remove rows that have already been selected
@@ -29,14 +33,15 @@ while (i < 50){
   # get neighbouring edges
   neighb <- remaining %>% filter(edge_id %in% neighb_id)
   # get id of best neighboring edge
-  edge_sel <- neighb$edge_id[which.max(neighb$flow_normalized)]
+  edge_sel <- neighb$edge_id[which.max(neighb$flow)]
   # get nest neighboring edge as df row
   edge_next <- graph_sf %>% filter(edge_id == edge_sel) %>% 
     mutate(sequence= i)
   # append it to the solution
   x <- rbind(x, edge_next)
-  
-  i = i+1
+  # if chosen edge already has infrastructure, don't count it
+  if (edge_next$cycle_infra == 0) {
+    i = i+1} 
 }
 
 plot(st_geometry(x))
@@ -59,7 +64,12 @@ growth <- function(graph, segments, col_name) {
   x <- x %>% filter(edge_id == edge_sel) %>% 
     mutate(sequence= 0)
   
-  i <- 1
+  # we don't want to include edges that already have cycling infrastructure in the iterator
+  # because they won't cost anything
+  if (x$cycle_infra == 0) {
+    i <- 1} else {
+      i <- 0}
+
   while (i < segments){
     # remove rows that have already been selected
     remaining <- graph %>% filter(!(edge_id %in% x$edge_id))
@@ -77,14 +87,15 @@ growth <- function(graph, segments, col_name) {
       mutate(sequence= i)
     # append it to the solution
     x <- rbind(x, edge_next)
-    
-    i = i+1
+    # Only count selected edges that have no cycling infrastructure
+    if (edge_next$cycle_infra == 0) {
+      i = i+1} 
   }
   return(x)
 }
 
 # check it
-test <- growth(graph_sf, 75, "flow_normalized")
+test <- growth(graph_sf, 75, "flow")
 plot(st_geometry(test))
 plot(st_geometry(graph_sf), col = 'lightgrey')
 plot(test["sequence"], add = TRUE)
@@ -102,8 +113,13 @@ growth2 <- function(graph, km, col_name) {
   # prepare row for adding to new df
   x <- x %>% filter(edge_id == edge_sel) %>% 
     mutate(sequence= 0)
-  j <- x$d
+  # i keeps track of which iteration a chosen edge was added in
   i <- 1
+  if (x$cycle_infra == 0) {
+    j <- x$d} else {
+      j <- 0}
+  
+  #while length of chosen segments is less than specified length 
   while (j/1000 < km){
     # remove rows that have already been selected
     remaining <- graph %>% filter(!(edge_id %in% x$edge_id))
@@ -123,46 +139,31 @@ growth2 <- function(graph, km, col_name) {
     x <- rbind(x, edge_next)
     
     i = i+1
-    j = j + edge_next$d
+    # Only count length of selected edges that have no cycling infrastructure.
+    # if condition is not met, j will not be changed in this iteration
+    if (edge_next$cycle_infra == 0) {
+      j = j + edge_next$d} 
   }
   return(x)
 }
 
 # check it
-test2 <- growth2(graph_sf, 75, "flow_normalized")
+test2 <- growth2(graph_sf, 75, "flow")
 plot(st_geometry(test2))
 plot(test2["sequence"])
 plot(st_geometry(graph_sf), col = 'lightgrey')
 plot(test2["sequence"], add = TRUE)
 
+# check that length argument was respected. length_total should be equal to passed length for 
+# cycle_infra == 0
+test2 %>% st_drop_geometry %>% group_by(cycle_infra) %>%
+  summarize(length_total = sum(d))
 
 
 
 
-
-
-
-
-
-
-
-# Understanging OSM
-
-cycle <- graph_sf %>% dplyr::filter(highway == 'cycleway')
-no_cycle <- graph_sf %>% dplyr::filter(highway != 'cycleway')
-
-plot(st_geometry(no_cycle))
-plot(st_geometry(cycle), add = TRUE, col = 'red')
-int <- st_intersection(no_cycle, cycle)
-plot(st_geometry(int))
-
-int <- st_intersection(graph_sf, cycle)
-
+# dodgr weight profiles
 weight_profiles <-dodgr::weighting_profiles$weighting_profiles %>% 
   filter(name == 'bicycle')
 
-x <- graph_sf %>% group_by(highway) %>% 
-  summarize(segments=n(), `length (m)` = sum(d))
-plot(st_geometry(x[8,]))
 
-plot(x["highway"])

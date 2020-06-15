@@ -7,13 +7,13 @@
     "folds" : "",
     "hash" : "0",
     "id" : "79CEF820",
-    "lastKnownWriteTime" : 1592050809,
-    "last_content_update" : 1592050809,
+    "lastKnownWriteTime" : 1592223335,
+    "last_content_update" : 1592223335029,
     "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/_6_prioritizing_segments.R",
     "project_path" : "_6_prioritizing_segments.R",
     "properties" : {
-        "cursorPosition" : "3,0",
-        "scrollLine" : "0",
+        "cursorPosition" : "156,0",
+        "scrollLine" : "147",
         "tempName" : "Untitled1"
     },
     "read_only" : false,
