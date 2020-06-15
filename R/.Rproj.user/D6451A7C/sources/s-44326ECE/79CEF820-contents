@@ -1,6 +1,6 @@
 library(sf)
 
-graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows.RDS"))
+graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_default.RDS"))
 # column to prioritize by. Change later
 #graph_sf$flow_normalized <- graph_sf$flow / graph_sf$d_weighted
 

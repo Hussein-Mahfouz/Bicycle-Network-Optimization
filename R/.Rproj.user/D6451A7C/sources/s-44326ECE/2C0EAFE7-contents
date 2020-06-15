@@ -40,45 +40,80 @@ to <- colnames(od_flow_matrix) %>% as.data.frame() %>% left_join(lon_lat, by = c
 
 # ROUTE
 # load in graph save in script 2
-graph <- readRDS(paste0("../data/",chosen_city,"/city_graph.Rds"))
-
-######
-# THIS GRAPH HAS THE DEFAULT WEIGHTING PROFILES (so Trunk = 0.3). I will change these:
-
-# library(jsonlite)
-# dodgr::write_dodgr_wt_profile(file = "x")
-# json_data <- jsonlite::fromJSON(txt="x.json")
-# json_data$weighting_profiles$name == 'bicycle' 
-# get specific row to edit
-# json_data$weighting_profiles$name == 'bicycle' & json_data$weighting_profiles$way == 'trunk'
-
-# TO DO THIS I SHOULD EITHER:
-# Do this in script 2 (Makes the most sense)
-# load streetnet here and edit weighting profiles (discard Rds loaded above)
+#graph <- readRDS(paste0("../data/",chosen_city,"/city_graph.Rds"))
+streetnet_sc <- readRDS(paste0("../data/",chosen_city,"/unweighted_streetnet.Rds"))
 ######
 
-# add flows to road segments
-graph_flows <- dodgr_flows_aggregate(
-                  graph = graph,
-                  from = from,
-                  to = to,
-                  flows = od_flow_matrix,
-                  contract = TRUE,
-                  quiet = FALSE)
+# CREATE GRAPHS WITH DIFFERENT WEIGHTING PROFILES. THE WEIGHTING PROFILES ARE EDITED BY
+# DOWNLOADING THE JSON IN -x-dodgr_weight_profiles.R AND EDITING IN A TEXT EDITOR
 
-# Turn into undirected graph
-graph_undir <- dodgr::merge_directed_flows(graph_flows)
+# this graph has the default dodgr weights for bicycle
+graph_default <- weight_streetnet(streetnet_sc, wt_profile= "bicycle")
+# all road types are weighted equally here. We use these weights to get the absolute shortest paths
+graph_unweighted <- weight_streetnet(streetnet_sc, 
+                                     wt_profile_file = "../data/weight_profile_shortest_path.json")
+# Here trunk roads are changed from 0.3 to 0.7 (equal to primary). The idea is that segregated 
+# bicycle lanes can easily be built on trunk roads (park lane, euston road), so this helps determine 
+# which trunk routes would be useful for cyclists
+graph_trunk <- weight_streetnet(streetnet_sc, 
+                                wt_profile_file = "../data/weight_profile_trunk.json")
 
-# convert to sf for prioritixing segments. 
-# Notice that the segments are merged (much less than graph_flows)
-graph_sf <- graph_undir %>% dodgr_to_sf()
+
+# # add flows to road segments
+# graph_flows <- dodgr_flows_aggregate(
+#                   graph = graph_default,
+#                   from = from, to = to, flows = od_flow_matrix,
+#                   contract = TRUE, quiet = FALSE)
+# 
+# # Turn into undirected graph 
+# graph_undir <- dodgr::merge_directed_flows(graph_flows)
+# 
+# # convert to sf for prioritixing segments. 
+# # Notice that the segments are merged (much less than graph_flows)
+# graph_sf_default <- graph_undir %>% dodgr_to_sf()
+
+# function to merge flows, turn into undirected graph, then to sf
+aggregate_flows <- function(graph, from, to, flows){
+  # add flows to road segments
+  graph_flows <- dodgr_flows_aggregate(
+        graph = graph,
+        from = from, 
+        to = to, 
+        flows = flows,
+        contract = TRUE, 
+        quiet = FALSE)
+  # turn into undirected graph
+  graph_undir <- dodgr::merge_directed_flows(graph_flows)
+  # convert to sf
+  graph_sf <- graph_undir %>% dodgr_to_sf()
+  return(graph_sf)
+  }
+
+# Use function to aggregate flows on graphs
+
+# graph with default weights
+graph_sf_default <- aggregate_flows(graph=graph_default, from=from, to=to, flows=od_flow_matrix)
+# unweighted graph
+graph_sf_unweight <- aggregate_flows(graph=graph_unweighted, from=from, to=to, flows=od_flow_matrix)
+# graph with modified trunk weight
+graph_sf_trunk <- aggregate_flows(graph=graph_trunk, from=from, to=to, flows=od_flow_matrix)
 
 # save as RDS to load in next script (geojson, shp etc cause problems)
-saveRDS(graph_sf, file = paste0("../data/", chosen_city, "/graph_with_flows.Rds"))
+saveRDS(graph_sf_default, file = paste0("../data/", chosen_city, "/graph_with_flows_default.Rds"))
+saveRDS(graph_sf_unweight, file = paste0("../data/", chosen_city, "/graph_with_flows_unweighted.Rds"))
+saveRDS(graph_sf_trunk, file = paste0("../data/", chosen_city, "/graph_with_flows_trunk.Rds"))
 
-rm(from, graph, graph_flows, graph_sf, graph_undir, lon_lat, od_flow, od_flow_matrix, to)
+
+# Plot the different results to compare. DO IT HERE NOT AFTER. IT DOESN't MATTER THAT CYCLEWAYS 
+# AREN'T COMPREHENSIVE IN DETERMINE BICYCLE INFRASTRUCTURE. WE ARE LOOKING AT THE EFFECTS OF WEIGHTS
+# ON ROUTING
+# See % of flow on cycleways, trunk ets
 
 
+rm(from, graph_default, graph_sf_default, graph_sf_trunk, graph_sf_unweight,
+   graph_trunk, graph_unweighted, lon_lat, od_flow, od_flow_matrix, streetnet_sc,
+   to, aggregate_flows)
+   
 
 
 

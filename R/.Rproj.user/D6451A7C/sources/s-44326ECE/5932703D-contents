@@ -111,12 +111,10 @@ streetnet_sc <- dodgr_streetnet_sc(pts = pts, expand = 0.05)
 # add the elevation data to the vertices
 streetnet_sc <- osmdata::osm_elevation(streetnet_sc, elev_file = c('../data/uk_elev.tif'))
 
+# SAVE STREETNET FOR SCRIPT 4. There we will be trying out different weighting profiles
+saveRDS(streetnet_sc, file = paste0("../data/",chosen_city,"/unweighted_streetnet.Rds"))
 # make graph for routing
 graph <- weight_streetnet(streetnet_sc, wt_profile = "bicycle")
-
-# SAVE TO LOAD IN NEXT TIME!
-saveRDS(graph, file = paste0("../data/",chosen_city,"/city_graph.Rds"))
-
 
 # contract graph for faster routing
 graph_contracted <- dodgr_contract_graph(graph)

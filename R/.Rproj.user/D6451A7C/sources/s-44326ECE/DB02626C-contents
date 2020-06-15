@@ -66,7 +66,7 @@ segregated <- streetnet2 %>%
 ########
 
 # Read in the graph with the road network and flows
-graph_sf <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows.RDS"))
+graph_sf <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows_default.RDS"))
 
 # this is all road segments with bicycle == 'designated'
 cycle_designated <- streetnet2 %>% 
@@ -138,7 +138,7 @@ graph_sf <- dplyr::left_join(graph_sf, graph_sf_cycle, by = "edge_id")
 graph_sf$cycle_infra[is.na(graph_sf$cycle_infra)] <- 0
 
 # save it as an RDS
-saveRDS(graph_sf, file = paste0("../data/", chosen_city, "/graph_with_flows.Rds"))
+saveRDS(graph_sf, file = paste0("../data/", chosen_city, "/graph_with_flows_default.Rds"))
 
 #clean environment
 rm(bicycle, bicycle_road, cycle_designated, cycleway, cycleways, graph_sf, 

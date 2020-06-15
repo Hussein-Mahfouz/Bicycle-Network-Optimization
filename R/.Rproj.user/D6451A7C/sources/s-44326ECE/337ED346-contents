@@ -269,8 +269,8 @@ ggplot(histogram, aes(x=dist)) +
   geom_histogram(data=flow_long_sustainable, fill = "red", alpha = 0.5) +
   geom_histogram(data= flow_long_bike, fill = "green", alpha = 0.5) 
 
-rm(flow, flow_plot, flow_long_active, flow_long_bike, flow_long_motor, flow_long_private, flow_long_sustainable,
-   histogram)
+rm(flow, flow_plot, flow_long_active, flow_long_bike, flow_long_motor, flow_long_private, 
+   flow_long_sustainable, histogram)
 ########
 
 
