@@ -141,6 +141,6 @@ graph_sf$cycle_infra[is.na(graph_sf$cycle_infra)] <- 0
 saveRDS(graph_sf, file = paste0("../data/", chosen_city, "/graph_with_flows_default.Rds"))
 
 #clean environment
-rm(bicycle, bicycle_road, cycle_designated, cycleway, cycleways, graph_sf, 
+rm(bicycle, cycle_designated, cycleway, cycleways, graph_sf, 
    graph_sf_cycle, highway, lanes, maxspeed, msoa_centroids, pts, segregated,
    sel_sgbp, streetnet, streetnet2, sel_logical)

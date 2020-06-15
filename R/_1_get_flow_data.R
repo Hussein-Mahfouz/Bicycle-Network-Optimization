@@ -11,7 +11,7 @@ city_names <- city_names %>% rename(city = TCITY15NM)
 unique(city_names$city)
 
 ##### CHOOSE YOU CITY 
-chosen_city <- "Oxford"
+chosen_city <- "Manchester"
 #create a directory to store data related to this city
 dir.create(paste0("../data/", chosen_city))
 

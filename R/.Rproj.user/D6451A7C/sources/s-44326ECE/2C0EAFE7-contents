@@ -75,7 +75,7 @@ graph_trunk <- weight_streetnet(streetnet_sc,
 # function to merge flows, turn into undirected graph, then to sf
 aggregate_flows <- function(graph, from, to, flows){
   # add flows to road segments
-  graph_flows <- dodgr_flows_aggregate(
+  graph_flows <- dodgr::dodgr_flows_aggregate(
         graph = graph,
         from = from, 
         to = to, 
@@ -85,7 +85,7 @@ aggregate_flows <- function(graph, from, to, flows){
   # turn into undirected graph
   graph_undir <- dodgr::merge_directed_flows(graph_flows)
   # convert to sf
-  graph_sf <- graph_undir %>% dodgr_to_sf()
+  graph_sf <-  dodgr::dodgr_to_sf(graph_undir)
   return(graph_sf)
   }
 
