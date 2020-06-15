@@ -80,11 +80,11 @@ msoa_centroids_snapped %>%
   cbind(st_coordinates(.)) %>%  #split geometry into X and Y columns
   rename(lon = X, lat = Y) %>%  # rename x and y
   dplyr::select(-c(msoa11nm)) %>% 
-  st_write("../data/alt_city/msoa_lon_lat.shp", append=FALSE) # save as shp file. append=FALSE to overwrite existing layer
-
+  #st_write("../data/alt_city/msoa_lon_lat.shp", append=FALSE) # save as shp file. append=FALSE to overwrite existing layer
+  st_write(paste0("../data/",chosen_city,"/msoa_lon_lat.shp"), append=FALSE)
 
 # read it in for dodgr_dist calculations (below)
-msoa_lon_lat <- st_read("../data/alt_city/msoa_lon_lat.shp") %>%
+msoa_lon_lat <- st_read(paste0("../data/",chosen_city,"/msoa_lon_lat.shp")) %>%
   dplyr::select(c(lon, lat))  %>%
   st_drop_geometry()
 
@@ -115,7 +115,7 @@ streetnet_sc <- osmdata::osm_elevation(streetnet_sc, elev_file = c('../data/uk_e
 graph <- weight_streetnet(streetnet_sc, wt_profile = "bicycle")
 
 # SAVE TO LOAD IN NEXT TIME!
-saveRDS(graph, file = "../data/alt_city/city_graph.Rds")
+saveRDS(graph, file = paste0("../data/",chosen_city,"/city_graph.Rds"))
 
 
 # contract graph for faster routing
@@ -133,7 +133,7 @@ dist_mat <- dist_mat %>%
   pivot_longer(-from, names_to = "to", values_to = "dist")
 
 # save to use in calculation of potential demand (next script)
-flows_city <- readr::read_csv("../data/alt_city/flows_city.csv")
+flows_city <- readr::read_csv(paste0("../data/",chosen_city,"/flows_city.csv"))
 
 # flows_london %>% subset(select = -c(city_origin, city_dest)) %>%
 #   left_join(dist_mat, by = c("Area of residence" = "from" , "Area of workplace" = "to")) %>%
@@ -187,7 +187,8 @@ flows_slope <- flows_slope %>% route(net = net) %>% slope(elev = uk_elev)
 
 flows_slope %>% 
   dplyr::select(-c(cent_orig, cent_dest, route)) %>%
-  write_csv(path = "../data/alt_city/flows_dist_elev_for_potential_flow.csv")
+  write_csv(path = paste0("../data/",chosen_city,"/flows_dist_elev_for_potential_flow.csv"))
+
 ##### ADD SLOPE - END
 
 
@@ -221,7 +222,7 @@ flows_slope %>%
 #   rename(dist_dodgr = dist)
 # 
 # # save for reference
-# write_csv(distances, path = "../data/dist_straight_vs_dodgr.csv")
+# write_csv(distances, path = paste0("../data/",chosen_city, dist_straight_vs_dodgr.csv"))
 
 # remove variables from global environment
 rm(city_names, dist_mat, flows_city, flows_slope, graph, graph_contracted,

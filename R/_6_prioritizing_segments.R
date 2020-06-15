@@ -1,6 +1,6 @@
 library(sf)
 
-graph_sf <- readRDS("../data/alt_city/graph_with_flows.RDS")
+graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows.RDS"))
 # column to prioritize by. Change later
 #graph_sf$flow_normalized <- graph_sf$flow / graph_sf$d_weighted
 
@@ -162,8 +162,6 @@ test2 %>% st_drop_geometry %>% group_by(cycle_infra) %>%
 
 
 
-# dodgr weight profiles
-weight_profiles <-dodgr::weighting_profiles$weighting_profiles %>% 
-  filter(name == 'bicycle')
+
 
 

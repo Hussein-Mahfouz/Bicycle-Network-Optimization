@@ -9,7 +9,7 @@ library(tidyverse)
 ########
 
 # centroids for bounding box of chosen city
-msoa_centroids <- st_read("../data/alt_city/msoa_lon_lat.shp")
+msoa_centroids <- st_read(paste0("../data/", chosen_city,"/msoa_lon_lat.shp"))
 
 # bounding box
 pts <- st_coordinates (msoa_centroids)
@@ -18,7 +18,7 @@ streetnet <- dodgr_streetnet(pts = pts, expand = 0.05)
 
 # filter out useful columns
 streetnet2 <- streetnet %>% 
-  dplyr::select(osm_id, bicycle, bicycle_road, cycleway, highway,
+  dplyr::select(osm_id, bicycle, cycleway, highway,
                 lanes, maxspeed, segregated)
 # add length column
 streetnet2 <- streetnet2 %>% dplyr::mutate(length_m = st_length(.))
@@ -31,12 +31,6 @@ streetnet2 <- streetnet2 %>% dplyr::mutate(length_m = st_length(.))
 bicycle <- streetnet2 %>% 
   st_drop_geometry() %>%
   group_by(bicycle) %>% 
-  summarize(segments=n(), length_m = sum(length_m))
-
-# useless
-bicycle_road <- streetnet2 %>% 
-  st_drop_geometry() %>%
-  group_by(bicycle_road) %>% 
   summarize(segments=n(), length_m = sum(length_m))
 
 cycleway <- streetnet2 %>% 
@@ -72,7 +66,7 @@ segregated <- streetnet2 %>%
 ########
 
 # Read in the graph with the road network and flows
-graph_sf <- readRDS("../data/alt_city/graph_with_flows.RDS")
+graph_sf <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows.RDS"))
 
 # this is all road segments with bicycle == 'designated'
 cycle_designated <- streetnet2 %>% 
@@ -133,7 +127,7 @@ sum(graph_sf_cycle$d)
 # join with graph_sf
 
 graph_sf_cycle <-
-  graph_sf_cycle%>% st_drop_geometry() %>%
+  graph_sf_cycle %>% st_drop_geometry() %>%
   mutate(cycle_infra= 1) %>%
   dplyr::select(c(edge_id, cycle_infra))
 
@@ -144,7 +138,7 @@ graph_sf <- dplyr::left_join(graph_sf, graph_sf_cycle, by = "edge_id")
 graph_sf$cycle_infra[is.na(graph_sf$cycle_infra)] <- 0
 
 # save it as an RDS
-saveRDS(graph_sf, file = "../data/alt_city/graph_with_flows.Rds")
+saveRDS(graph_sf, file = paste0("../data/", chosen_city, "/graph_with_flows.Rds"))
 
 #clean environment
 rm(bicycle, bicycle_road, cycle_designated, cycleway, cycleways, graph_sf, 

@@ -11,7 +11,10 @@ city_names <- city_names %>% rename(city = TCITY15NM)
 unique(city_names$city)
 
 ##### CHOOSE YOU CITY 
-chosen_city <- "Manchester"
+chosen_city <- "Oxford"
+#create a directory to store data related to this city
+dir.create(paste0("../data/", chosen_city))
+
 ##### CHOOSE YOU CITY 
 
 # flow data from the 2011 census https://www.nomisweb.co.uk/census/2011/bulk/rOD1
@@ -44,7 +47,7 @@ flows_city <- flows_internal(chosen_city) %>%
   dplyr::filter(`All categories: Method of travel to work` > 10) 
 
 # save as csv to use in next step
-write_csv(flows_city, path = "../data/alt_city/flows_city.csv")
+write_csv(flows_city, path = paste0("../data/", chosen_city, "/flows_city.csv"))
 
 # remove variables from global environment
 rm(flows, flows_city, flows_internal)

@@ -7,13 +7,13 @@
     "folds" : "39|50|54|0|\n",
     "hash" : "0",
     "id" : "5932703D",
-    "lastKnownWriteTime" : 1591949829,
-    "last_content_update" : 1591949829272,
+    "lastKnownWriteTime" : 1592228503,
+    "last_content_update" : 1592228503892,
     "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/_2_distance_and_elevation.R",
     "project_path" : "_2_distance_and_elevation.R",
     "properties" : {
-        "cursorPosition" : "74,9",
-        "scrollLine" : "67",
+        "cursorPosition" : "191,21",
+        "scrollLine" : "177",
         "tempName" : "Untitled1"
     },
     "read_only" : false,

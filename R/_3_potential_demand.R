@@ -3,7 +3,7 @@ library(stplanr)
 library(pct)
 
 # read in the data
-flow <- readr::read_csv("../data/alt_city/flows_dist_elev_for_potential_flow.csv")
+flow <- readr::read_csv(paste0("../data/",chosen_city,"/flows_dist_elev_for_potential_flow.csv"))
 # replace NA values with the mean slope
 flow$slope[is.na(flow$slope)] <- mean(na.omit(flow$slope))
 
@@ -31,7 +31,7 @@ uptake_pct <- uptake_pct %>%
 # save csv to use in '4_aggregating_flows'
 uptake_pct %>% 
   subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
-  write_csv(path = "../data/alt_city/flows_for_aggregated_routing_opt_1.csv")
+  write_csv(path = paste0("../data/",chosen_city, "/flows_for_aggregated_routing_opt_1.csv"))
 
 # all number should be above 0. Cycling should not be more than toal trips...
 uptake_pct$increase = uptake_pct$`All categories: Method of travel to work` - uptake_pct$potential_demand
@@ -67,7 +67,7 @@ uptake_cutoff <- potential_demand(data=flow)
 # save as csv
 uptake_cutoff %>% 
   subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
-  write_csv(path = "../data/alt_city/flows_for_aggregated_routing_opt_2.csv")
+  write_csv(path = paste0("../data/",chosen_city, "/flows_for_aggregated_routing_opt_2.csv"))
 
 rm(uptake_cutoff)
 ###############
@@ -136,7 +136,7 @@ ggplot(uptake_decay) +
 # what is the current proportion of cyclists
 cycle_current <- sum(uptake_decay$Bicycle) / sum(uptake_decay$`All categories: Method of travel to work`)
 # Let's assume we want cycling mode share to increase to 20%
-cycle_target <- 0.2
+cycle_target <- cycle_current + 0.1
 # no. of additional cycling trips needed to acheive target
 cycle_add <- round((cycle_target * sum(uptake_decay$`All categories: Method of travel to work`)) - sum(uptake_decay$Bicycle))
 
@@ -182,7 +182,7 @@ ggplot(uptake_decay) +
 #save csv
 uptake_decay %>% 
   subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
-  write_csv(path = "../data/alt_city/flows_for_aggregated_routing_opt_3.csv")
+  write_csv(path = paste0("../data/",chosen_city, "/flows_for_aggregated_routing_opt_3.csv"))
 
 rm(cycle_add, cycle_current, cycle_target, multiply_factor, uptake_decay, uptake_no_intra, glm1,
    rsq, potential_demand)
