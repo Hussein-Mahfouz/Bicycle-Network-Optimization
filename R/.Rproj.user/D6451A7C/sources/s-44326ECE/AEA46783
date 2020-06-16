@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592336023753.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3630820095",
+    "id" : "AEA46783",
+    "lastKnownWriteTime" : 1592336112,
+    "last_content_update" : 1592336112855,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/README.Rmd",
+    "project_path" : "../README.Rmd",
+    "properties" : {
+        "cursorPosition" : "18,7",
+        "last_setup_crc32" : "44326ECEbb338d19",
+        "scrollLine" : "14",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
