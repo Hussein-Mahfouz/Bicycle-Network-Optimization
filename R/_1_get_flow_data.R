@@ -12,8 +12,10 @@ unique(city_names$city)
 
 ##### CHOOSE YOU CITY 
 chosen_city <- "Manchester"
-#create a directory to store data related to this city
-dir.create(paste0("../data/", chosen_city))
+#create a directory to store data related to this city (does nothing if directory already exists)
+dir.create(paste0("../data/", chosen_city), showWarnings = FALSE)
+# create sub-directory to save plots as well
+dir.create(paste0("../data/", chosen_city,"/Plots"), showWarnings = FALSE)
 
 ##### CHOOSE YOU CITY 
 

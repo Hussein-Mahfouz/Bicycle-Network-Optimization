@@ -140,7 +140,56 @@ graph_sf$cycle_infra[is.na(graph_sf$cycle_infra)] <- 0
 # save it as an RDS
 saveRDS(graph_sf, file = paste0("../data/", chosen_city, "/graph_with_flows_default.Rds"))
 
+###### FUNCTION TO ADD BINARY COLUMN INDICATING THE PRESENCE OF CYCLING INFRASTRUCTURE #####
+
+# Turn the above into a function so I can use it with aggregated-flow graphs outputed using different 
+# weighting profiles
+
+infra_exists <- function(graph, network){
+
+  # create a combined geometry with all edges matching either of the two conditions
+  graph_cycle <- network %>% 
+  filter(highway == 'cycleway' | bicycle == 'designated') %>%
+  st_combine()
+  
+  # Get all features of graph_sf that have dedicated cycling infrastructure
+  sel_sgbp <- st_within(x=graph, y=graph_cycle)
+  sel_logical <- lengths(sel_sgbp) > 0
+  graph_cycle <- graph[sel_logical, ]
+  
+  # We need to add a column in graph_sf to identify all edges with cycle infrastructure
+  # add a cycle_infra column to graph_sf_cycle and give all edges a value of 1, then 
+  # join with graph
+  graph_cycle <-
+    graph_cycle %>% st_drop_geometry() %>%
+    mutate(cycle_infra= 1) %>%
+    dplyr::select(c(edge_id, cycle_infra))
+  
+  #join the cycle_infra column to the original graph
+  graph <- dplyr::left_join(graph, graph_sf_cycle, by = "edge_id")
+  
+  # all NA values in cycle_infra are those that had nothing to join to. It means they have no 
+  # cycling infrastructure. We will give them a value of 0 for cycle_infra
+  graph$cycle_infra[is.na(graph$cycle_infra)] <- 0
+  
+  return(graph)
+}
+
+# Read in the other graphs, add column for cycling infrastrucure, then overwrite
+graph_sf_unweight <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows_unweighted.RDS"))
+graph_sf_unweight <- infra_exists(graph=graph_sf_unweight, network=streetnet2)
+saveRDS(graph_sf_unweight, file = paste0("../data/", chosen_city, "/graph_with_flows_unweighted.Rds"))
+
+
+graph_sf_trunk <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows_trunk.RDS"))
+graph_sf_trunk <- infra_exists(graph_sf_trunk, streetnet2)
+saveRDS(graph_sf_trunk, file = paste0("../data/", chosen_city, "/graph_with_flows_trunk.Rds"))
+
+
 #clean environment
 rm(bicycle, cycle_designated, cycleway, cycleways, graph_sf, 
-   graph_sf_cycle, highway, lanes, maxspeed, msoa_centroids, pts, segregated,
+   graph_sf_cycle, graph_sf_trunk, graph_sf_unweight, 
+   highway, lanes, maxspeed, msoa_centroids, pts, segregated,
    sel_sgbp, streetnet, streetnet2, sel_logical)
+
+
