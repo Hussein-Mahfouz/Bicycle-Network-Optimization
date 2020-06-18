@@ -83,6 +83,44 @@ ggsave(path = paste0("../data/", chosen_city,"/Plots"), file="person-km-per-high
 
 
 
+###### PLOT HIGHWAY TYPES ######
+
+# I am not plotting the graph directly as it only has the roads that had flow. I will download the OSM
+# data and filter it to the bounding box of the graph
+# get bounding box for downloading data
+
+#get bb
+pts <- st_coordinates(graph_sf_default)
+# download using dodgr
+roads <- dodgr_streetnet(pts = pts, expand = 0) 
+# filter to graph boundary 
+roads <- st_filter(roads, graph_sf_default)
+
+x <- roads %>% 
+  dplyr::filter(!(highway %in% c('trunk_link', 'track', 'tertiary_link', 'steps', 
+                                 'secondary_link', 'primary_link', 'living_street',
+                                 'motorway_link', 'path', 'service', 'unclassified',
+                                  NA, 'road')))
+
+tm_shape(x) +
+  tm_lines(col = 'gray95') +
+tm_shape(x) +
+  tm_lines(col = 'highway', 
+           scale = 1.5,     #multiply line widths by 3
+           palette = "Set2") +
+  tm_layout(title = "OSM Road Types - All Roads",        
+            title.size = 1.2,
+            title.color = "azure4",
+            title.position = c("left", "top"),
+            inner.margins = c(0.1, 0.25, 0.1, 0.1),    # bottom, left, top, and right margin
+            fontfamily = 'Georgia',
+            legend.position = c("right", "bottom"),
+            frame = FALSE) -> p
+
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/osm_road_types_all.png"))
+
+
+#### Roads with Routed Flow Only 
 
 #remove highway types that have very little share (for plotting purposes)
 x <- graph_sf_default %>% 
@@ -92,11 +130,11 @@ x <- graph_sf_default %>%
 
 tm_shape(x) +
   tm_lines(col = 'gray95') +
-tm_shape(x) +
+  tm_shape(x) +
   tm_lines(col = 'highway', 
            scale = 1.5,     #multiply line widths by 3
            palette = "Set2") +
-  tm_layout(title = "OSM Road Types \nOnly Roads with Routed Flow",        
+  tm_layout(title = "OSM Road Types - Only Roads with Routed Flow",        
             title.size = 1.2,
             title.color = "azure4",
             title.position = c("left", "top"),
@@ -105,16 +143,41 @@ tm_shape(x) +
             legend.position = c("right", "bottom"),
             frame = FALSE) -> p
 
-tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/osm_road_types.png"))
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/osm_road_types_routed.png"))
 
-# facet plot of flows. works but v slow (2 mins)
-x <- graph_sf_default %>% 
+
+
+#### FACET PLOT OF ROAD TYPES ####
+
+tm_shape(x) +
+  tm_lines(col = "darkgrey") +    
+  tm_facets(by="highway",
+            nrow = 2,
+            free.coords=FALSE)  +  # so that the maps aren't different sizes
+  tm_layout(fontfamily = 'Georgia',
+            main.title = "Road Types", # this works if you need it
+            main.title.size = 1.2,
+            main.title.color = "azure4",
+            main.title.position = "left",
+            legend.outside.position = "bottom" , 
+            legend.outside.size = .1,
+            #inner.margins = c(0.01, 0.01, 0.01, 0.01),
+            frame = FALSE)  -> p
+
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/osm_road_types_facet.png"),
+          width=10, height=6)
+
+
+
+###### FACET PLOT OF FLOWS. works but v slow (2 mins) ######
+# 1. default weighting
+facet_1 <- graph_sf_default %>% 
   dplyr::filter(!(highway %in% c('trunk_link', 'track', 'tertiary_link', 'steps', 
                                  'secondary_link', 'primary_link', 'living_street',
                                  'motorway_link', 'path', 'service', 'unclassified'))) 
-tm_shape(x) +
+tm_shape(facet_1) +
     tm_lines(col = 'gray92') +
-tm_shape(x) +
+tm_shape(facet_1) +
     tm_lines(lwd = "flow",
              scale = 8,  #multiply line widths by scale
              col = "darkgreen") +    
@@ -122,7 +185,7 @@ tm_shape(x) +
               nrow = 2,
               free.coords=FALSE)  +  # so that the maps aren't different sizes
     tm_layout(fontfamily = 'Georgia',
-              main.title = "Flows on Different Road Types", # this works if you need it
+              main.title = "Default Weighting Profiles", # this works if you need it
               main.title.size = 1.3,
               main.title.color = "azure4",
               main.title.position = "left",
@@ -133,5 +196,156 @@ tm_shape(x) +
 
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/flows_facet_default.png"), 
           width=10, height=6)
+
+
+# 2. Unweighted
+facet_2 <- graph_sf_unweight %>% 
+  dplyr::filter(!(highway %in% c('trunk_link', 'track', 'tertiary_link', 'steps', 
+                                 'secondary_link', 'primary_link', 'living_street',
+                                 'motorway_link', 'path', 'service', 'unclassified'))) 
+
+tm_shape(facet_2) +
+  tm_lines(col = 'gray92') +
+tm_shape(facet_2) +
+  tm_lines(lwd = "flow",
+           scale = 8,  #multiply line widths by scale
+           col = "darkgreen") +    
+tm_facets(by="highway",
+          nrow = 2,
+          free.coords=FALSE)  +  # so that the maps aren't different sizes
+tm_layout(fontfamily = 'Georgia',
+          main.title = "Unweighted Shortest Paths", # this works if you need it
+          main.title.size = 1.3,
+          main.title.color = "azure4",
+          main.title.position = "left",
+          legend.outside.position = "bottom" , 
+          legend.outside.size = .1,
+          frame = FALSE)  -> p
+
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/flows_facet_unweighted.png"), 
+          width=10, height=6)
+
+# 2. Trunk weight
+facet_3 <- graph_sf_trunk %>% 
+  dplyr::filter(!(highway %in% c('trunk_link', 'track', 'tertiary_link', 'steps', 
+                                 'secondary_link', 'primary_link', 'living_street',
+                                 'motorway_link', 'path', 'service', 'unclassified'))) 
+tm_shape(facet_3) +
+  tm_lines(col = 'gray92') +
+tm_shape(facet_3) +
+  tm_lines(lwd = "flow",
+           scale = 8,  #multiply line widths by scale
+           col = "darkgreen") +    
+tm_facets(by="highway",
+          nrow = 2,
+          free.coords=FALSE)  +  # so that the maps aren't different sizes
+tm_layout(fontfamily = 'Georgia',
+          main.title = "Reduced Impedence on Trunk Roads", # this works if you need it
+          main.title.size = 1.3,
+          main.title.color = "azure4",
+          main.title.position = "left",
+          legend.outside.position = "bottom" , 
+          legend.outside.size = .1,
+          frame = FALSE)  -> p
+
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/flows_facet_trunk.png"), 
+          width=10, height=6)
+
+
+
+# Facet map with one road type and different weighting profiles
+
+road_type <- "trunk"
+# this needs to be edited manually based on the road type and observing the ranges of the different plots
+lwd_legend = c(250, 500, 750, 1000, 1500, 2000)
+
+plot1 <- graph_sf_default %>% 
+  dplyr::filter(highway == road_type)
+
+tm_shape(facet_1) +
+  tm_lines(col = 'gray92') +
+tm_shape(plot1) +
+  tm_lines(lwd = "flow",
+           #lwd.legend = lwd_legend,
+           scale = 3,  #multiply line widths by scale
+           col = "darkgreen") +    
+tm_layout(fontfamily = 'Georgia',
+            # title = "Weight profile 1", # this works if you need it
+            # title.size = 1.2,
+            # title.color = "azure4",
+            #inner.margins = c(0, 0, 0.03, 0),
+            #legend.outside = TRUE,
+            #legend.outside.position = "bottom",
+            #legend.title.size=0.85,
+            legend.show = FALSE,
+            #legend.position = c("right", "bottom"),
+            frame = FALSE)  -> p1
+
+plot2 <- graph_sf_unweight %>% 
+  dplyr::filter(highway == road_type)
+
+tm_shape(facet_2) +
+  tm_lines(col = 'gray92') +
+  tm_shape(plot2) +
+  tm_lines(lwd = "flow",
+           #lwd.legend = lwd_legend,
+           scale = 3,  #multiply line widths by scale
+           col = "darkgreen") +    
+  tm_layout(fontfamily = 'Georgia',
+            # title = "Weight profile 2", # this works if you need it
+            # title.size = 1.2,
+            # title.color = "azure4",
+            #inner.margins = c(0, 0, 0.03, 0),
+            #legend.outside = TRUE,
+            #legend.outside.position = "bottom",
+            #legend.title.size=0.85,
+            legend.show = FALSE,
+            #legend.position = c("right", "bottom"),
+            frame = FALSE)  -> p2
+
+
+plot3 <- graph_sf_trunk %>% 
+  dplyr::filter(highway == road_type)
+
+tm_shape(facet_3) +
+  tm_lines(col = 'gray92') +
+  tm_shape(plot3) +
+  tm_lines(lwd = "flow",
+           #lwd.legend = lwd_legend,
+           scale = 3,  #multiply line widths by scale
+           col = "darkgreen",
+           legend.lwd.is.portrait = TRUE) +    
+  tm_layout(fontfamily = 'Georgia',
+            # title = "Weight profile 3", 
+            # title.size = 1.2,
+            # title.color = "azure4",
+            #inner.margins = c(0, 0, 0.05, 0),
+            #legend.outside = TRUE,
+            #legend.outside.position = "right",
+            #legend.title.size=0.85,
+            legend.show = FALSE,
+            #legend.position = c("right", "bottom"),
+            frame = FALSE)  -> p3
+
+### legend only 
+tm_shape(plot3) +
+  tm_lines(lwd = "flow",
+           scale = 3,  
+           col = "darkgreen",
+           legend.lwd.is.portrait = TRUE) +    
+  tm_layout(fontfamily = 'Georgia',
+            legend.position = c("left", "top"),
+            legend.title.size=0.85,
+            legend.only = TRUE)  -> legend
+
+#facet_road_type <- tmap_arrange(p1, p2, p3, nrow=1)
+facet_road_type <- tmap_arrange(p1, p2, p3, legend, nrow=1)
+
+
+tmap_save(tm = facet_road_type, filename = paste0("../data/", chosen_city,"/Plots/",road_type,"_facet3.png"),
+          height=4, width= 9)
+
+
+
 
 
