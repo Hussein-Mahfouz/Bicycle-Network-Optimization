@@ -16,6 +16,8 @@ msoas_in_city <- function(df, city_name) {
 }
 # get MSOAs in chosen_city. chosen_city is chosen in script 1
 msoas_city <- msoas_in_city(city_names, chosen_city)
+#save it for plotting later
+write_csv(msoas_city, path = paste0("../data/",chosen_city,"/msoa_codes_city.csv"))
 
 # get population weighted centroids from pct and change crs (default is northing)
 msoa_centroids <- pct::get_centroids_ew() %>% st_transform(4326)
@@ -226,5 +228,4 @@ flows_slope %>%
 rm(city_names, dist_mat, flows_city, flows_slope, graph, graph_contracted,
    msoa_centroids, msoa_centroids_snapped, msoa_lon_lat, msoas_city,
    net, pts, streetnet_sc, uk_elev)
-
 

@@ -81,7 +81,10 @@ rm(uptake_cutoff)
 uptake_decay <- flow
 # What to do with dist= NA
 #1. Remove these rows
-uptake_decay <- uptake_decay %>% subset(!is.na(dist))
+
+#uptake_decay1 <- uptake_decay %>% subset(!is.na(dist))
+uptake_decay <- uptake_decay %>% filter(!is.na(dist))
+
 # 2.replace NA values by column mean 
 #uptake_decay$dist[is.na(uptake_decay$dist)] <- max(uptake_decay$dist[!is.na(uptake_decay$dist)])
 
@@ -122,7 +125,7 @@ rsq(uptake_decay$perc_cycle,uptake_decay$prob_cycle)
 #rsq(uptake_no_intra$perc_cycle, uptake_no_intra$prob_cycle)
 
 ggplot(uptake_decay) +
-  geom_point(aes(perc_cycle, prob_cycle))
+  geom_point(aes(perc_cycle, prob_cycle)) 
 
 # show probabilty of cycling vs distance
 ggplot(uptake_decay) +
@@ -189,90 +192,34 @@ rm(cycle_add, cycle_current, cycle_target, multiply_factor, uptake_decay, uptake
 
 
 
+##### Better Plots #####
+# Plot distance vs percentage cycling
+# plot slope vs percentage cycling
+# plot distance vs perc and prob
+
+# plot dist vs bicycle and potential demand
+# WHAT ELSE?
+
+plot <- uptake_decay  %>% 
+  dplyr::select(dist, slope, potential_demand, cycle_fraction, perc_cycle, prob_cycle) %>%
+  pivot_longer(cols = c(perc_cycle, prob_cycle)) 
+
+ggplot(plot, aes(x = dist, y = value, color=name)) +
+  #geom_point() +
+  geom_smooth()
+
+ggplot(plot, aes(x = slope, y = value, color=name)) +
+  #geom_point() +
+  geom_smooth()
 
 
-######## 
-# PLOTTING DISTANCE VS FLOW
-########
-#plot distance vs flow
-# remove intra flows
-flow_plot <- flow %>% dplyr::filter(`Area of residence` != `Area of workplace`)
+ggplot(uptake_decay, aes(x = slope, y = perc_cycle)) +
+  geom_point() +
+  geom_smooth()
 
-# all motorized trips
-flow_plot$motor <- flow_plot$`Underground, metro, light rail, tram` + flow_plot$Train +
-  flow_plot$`Bus, minibus or coach` + flow_plot$Taxi + flow_plot$`Motorcycle, scooter or moped` + 
-  flow_plot$`Driving a car or van` + flow_plot$`Passenger in a car or van`
-
-# all non_motorized trips
-flow_plot$active <- flow_plot$Bicycle + flow_plot$`On foot` 
-
-# all trips by public transport or acyive modes
-flow_plot$sustainable <- flow_plot$active + flow_plot$`Underground, metro, light rail, tram` + 
-  flow_plot$Train + flow_plot$`Bus, minibus or coach` 
-
-# all trips by private vehicles
-flow_plot$private <- flow_plot$Taxi + flow_plot$`Motorcycle, scooter or moped` + 
-  flow_plot$`Driving a car or van` + flow_plot$`Passenger in a car or van` 
-
-# subset for histograms
-flow_plot <- flow_plot %>% dplyr::select(`Area of residence`, `Area of workplace`, 
-                                `All categories: Method of travel to work`, 
-                                Bicycle, motor, active, sustainable, private, dist)
-
-# repeat each row based on the value in Bicycle (for histogram!)
-flow_long_bike <- flow_plot %>% tidyr::uncount(Bicycle) %>%
-  dplyr::select(`Area of residence`, `Area of workplace`, dist)
-
-ggplot(flow_long_bike, aes(x = dist)) + 
-  geom_histogram(color = "black", alpha = 0.5, binwidth = 250) +
-  labs(title = "Bicycle Trips", x="Commuting Distance (km)", y = "No. of trips")
-
-###
-flow_long_motor <- flow_plot %>% tidyr::uncount(motor) %>%
-  dplyr::select(`Area of residence`, `Area of workplace`, dist)
-
-ggplot(flow_long_motor, aes(x = dist)) + 
-  geom_histogram(color = "black", alpha = 0.5) +
-  labs(title = "All Motorized Trips", x="Commuting Distance (km)", y = "No. of trips")
-
-### 
-flow_long_active <- flow_plot %>% tidyr::uncount(active) %>%
-  dplyr::select(`Area of residence`, `Area of workplace`, dist)
-
-ggplot(flow_long_active, aes(x = dist)) + 
-  geom_histogram(color = "black", alpha = 0.5) +
-  labs(title = "Active Trips", x="Commuting Distance (km)", y = "No. of trips")
-
-### 
-flow_long_sustainable <- flow_plot %>% tidyr::uncount(sustainable) %>%
-  dplyr::select(`Area of residence`, `Area of workplace`, dist)
-
-ggplot(flow_long_sustainable, aes(x = dist)) + 
-  geom_histogram(color = "black", alpha = 0.5) +
-  labs(title = "Trips Made by Sustainable Modes", 
-       x="Commuting Distance (km)", y = "No. of trips")
-
-### 
-flow_long_private <- flow_plot %>% tidyr::uncount(private) %>%
-  dplyr::select(`Area of residence`, `Area of workplace`, dist)
-
-ggplot(flow_long_private, aes(x = dist)) + 
-  geom_histogram(color = "black", alpha = 0.5) +
-  labs(title = "Trips Made by Private Vehicles", 
-       x="Commuting Distance (km)", y = "No. of trips")
-
-# to plot different histograms together
-histogram<- rbind(flow_long_motor, flow_long_bike, flow_long_sustainable)
-
-ggplot(histogram, aes(x=dist)) + 
-  geom_histogram(data=flow_long_motor, fill = "blue", alpha = 0.9) +
-  geom_histogram(data=flow_long_sustainable, fill = "red", alpha = 0.5) +
-  geom_histogram(data= flow_long_bike, fill = "green", alpha = 0.5) 
-
-rm(flow, flow_plot, flow_long_active, flow_long_bike, flow_long_motor, flow_long_private, 
-   flow_long_sustainable, histogram)
-########
-
+ggplot(uptake_decay, aes(x = slope, y = Bicycle)) +
+  geom_point() +
+  geom_smooth()
 
 
 

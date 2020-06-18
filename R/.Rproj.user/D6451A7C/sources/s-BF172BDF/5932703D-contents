@@ -228,5 +228,4 @@ flows_slope %>%
 rm(city_names, dist_mat, flows_city, flows_slope, graph, graph_contracted,
    msoa_centroids, msoa_centroids_snapped, msoa_lon_lat, msoas_city,
    net, pts, streetnet_sc, uk_elev)
-rm(msoas_city)
 
