@@ -124,15 +124,6 @@ rsq  <- function(observed,estimated){
 rsq(uptake_decay$perc_cycle,uptake_decay$prob_cycle)
 #rsq(uptake_no_intra$perc_cycle, uptake_no_intra$prob_cycle)
 
-ggplot(uptake_decay) +
-  geom_point(aes(perc_cycle, prob_cycle)) 
-
-# show probabilty of cycling vs distance
-ggplot(uptake_decay) +
-  geom_point(aes(dist, prob_cycle), color = 'green') +
-  geom_point(aes(dist, perc_cycle), color = "red") +
-  labs( x="Commuting Distance (km)", y = "Uptake (%)")
-  
 
 ## DISTRIBUTE ADDITIONAL FLOWS ##
 
@@ -169,57 +160,21 @@ min(uptake_decay$cycle_fraction)
 # mode share of potential_deand column should = cycle_target
 sum(uptake_decay$potential_demand) / sum(uptake_decay$`All categories: Method of travel to work`)
 
-# Show how the number of additional cyclists has been distributed
-ggplot(uptake_decay) +
-  geom_smooth(aes(dist, potential_demand), color = 'green') +
-  geom_smooth(aes(dist, Bicycle), color = "red") +
-  labs( x="Commuting Distance (m)", y = "No. of Cyclists")
-
-# show the cycling mode share vs distance
-ggplot(uptake_decay) +
-  geom_smooth(aes(dist, perc_cycle), color = 'red') + # old mode share
-  geom_smooth(aes(dist, cycle_fraction), color = "green") + # new mode share
-  labs( x="Commuting Distance (m)", y = "Cycling Mode Share (%)")
-
-
-#save csv
+#save csv for routing
 uptake_decay %>% 
   subset(select = c(`Area of residence`, `Area of workplace`, `potential_demand`)) %>%
   write_csv(path = paste0("../data/",chosen_city, "/flows_for_aggregated_routing_opt_3.csv"))
 
-rm(cycle_add, cycle_current, cycle_target, multiply_factor, uptake_decay, uptake_no_intra, glm1,
-   rsq, potential_demand)
+#save csv for plotting desire_lines (script: _3.2_plot_od_comparisons)
+uptake_decay %>%
+  write_csv(path = paste0("../data/",chosen_city, "/flows_for_desire_lines.csv"))
+
+rm(cycle_add, cycle_current, multiply_factor, uptake_decay, uptake_no_intra, glm1,
+   rsq, potential_demand, flow)
 
 
 
-##### Better Plots #####
-# Plot distance vs percentage cycling
-# plot slope vs percentage cycling
-# plot distance vs perc and prob
-
-# plot dist vs bicycle and potential demand
-# WHAT ELSE?
-
-plot <- uptake_decay  %>% 
-  dplyr::select(dist, slope, potential_demand, cycle_fraction, perc_cycle, prob_cycle) %>%
-  pivot_longer(cols = c(perc_cycle, prob_cycle)) 
-
-ggplot(plot, aes(x = dist, y = value, color=name)) +
-  #geom_point() +
-  geom_smooth()
-
-ggplot(plot, aes(x = slope, y = value, color=name)) +
-  #geom_point() +
-  geom_smooth()
-
-
-ggplot(uptake_decay, aes(x = slope, y = perc_cycle)) +
-  geom_point() +
-  geom_smooth()
-
-ggplot(uptake_decay, aes(x = slope, y = Bicycle)) +
-  geom_point() +
-  geom_smooth()
 
 
 
+       

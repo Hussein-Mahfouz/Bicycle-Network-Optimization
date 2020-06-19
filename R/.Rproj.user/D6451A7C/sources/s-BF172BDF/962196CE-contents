@@ -96,7 +96,7 @@ desire_cycling_long <- desire_cycling_long %>% pivot_longer(cols = c(Bicycle, po
 
 
 
-###### FACET PLOT OF CURRENT AND POTENTIAL CYCLING DEEMAND ######
+###### FACET PLOT OF CURRENT AND POTENTIAL CYCLING DEMAND ######
 
 tm_shape(city_geom) +
   tm_borders(col = "grey80", 
