@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591790546209.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "2C0EAFE7",
+    "lastKnownWriteTime" : 1592243514,
+    "last_content_update" : 1592243514501,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/_4_aggregating_flows.R",
+    "project_path" : "_4_aggregating_flows.R",
+    "properties" : {
+        "cursorPosition" : "103,56",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
