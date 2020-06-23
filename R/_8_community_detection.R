@@ -128,7 +128,7 @@ plot(road_segments['group'])
 
 #################### 3. MAPPING  ######################
 
-# 1. map of msoa centroids colored by community
+# 3.1. map of msoa centroids colored by community
 
 # convert to character for legend
 nodes$Community <- as.character(nodes$group)
@@ -140,9 +140,10 @@ tm_shape(msoa_borders) +
           size = 0.1,
           palette = "Set1") +
   tm_layout(fontfamily = 'Georgia',
-            frame = FALSE)
+            legend.show=FALSE,
+            frame = FALSE) -> tm1
 
-# 2. map of road segments colored by community
+# 3.2. map of road segments colored by community
 
 # convert group column to categorical so that we don't get 1-1.5, 2-2.5 etc in the legend
 road_segments$Community <- as.character(road_segments$group)
@@ -152,9 +153,20 @@ tm_shape(road_segments) +
           col = "Community",
           palette = "Set1") +
   tm_layout(fontfamily = 'Georgia',
-            frame = FALSE)
+            legend.show=FALSE,
+            frame = FALSE) -> tm2
+
+# 3.3  get legend only for facet map
+tm_shape(road_segments) +
+  tm_lines(col = "Community",
+           palette = "Set1") +
+  tm_layout(fontfamily = 'Georgia',
+            legend.only=TRUE,
+            frame = FALSE) -> tm_leg
 
 # can do a tmap arrange here but am I bovered?!
+tmap_arrange(tm1, tm2, tm_leg, nrow=1)
+
 
 # CLEAR ENVIRONMENT!!!
 
