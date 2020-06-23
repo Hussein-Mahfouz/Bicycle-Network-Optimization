@@ -1,38 +1,15 @@
 library(sf)
 library(sfnetworks)
-library(tidyverse)
-library(linkcomm)
 library(tidygraph)
+library(tidyverse)
+library(tmap)
 
 
-graph_t <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows_default.RDS"))
-graph_t <- graph_t %>% dplyr::select(flow)
+###### COMMUNITY DETECTION ######
 
-
-##### linkcomm testing #####
-
-graph_link <- graph_t %>% st_drop_geometry %>% dplyr::select(from_id, to_id, flow)
-# community detection
-lc <- linkcomm::getLinkCommunities(graph_link, hcmethod = "single")
-# get edges (output columns: node1, node2, cluster)
-lc_edges <- lc$edges
-#lc_nodes <- lc$nodeclusters
-# count number of edges in each cluster
-edge_clusters <- lc_edges %>% group_by(cluster) %>% 
-  summarize(count = n()) %>% arrange(desc(count))
-# join cluster colun back onto sf graph
-graph_t_link <- graph_t %>% left_join(lc_edges, by = c("from_id" = "node1", "to_id" = "node2"))
-# get top_n(n) clusters based on the number of edges assigned to them
-top_clusters <- edge_clusters %>% top_n(15) %>% select(cluster) 
-# change to integer to pass into dplyr::filter
-top_clusters <- as.integer(top_clusters$cluster)
-# get all edges in the top_n(n) clusters
-edges <- graph_t_link %>% dplyr::filter(cluster %in% top_clusters)
-
-# plot to explore
-plot(st_geometry(graph_t), col = "lightgrey")
-#plot(st_geometry(edges), add = TRUE)
-plot(edges['cluster'], add=TRUE)
+# edges are the msoa od pairs. 
+# nodes are the msoa centroids
+# You don''t need the nodes for community detection. They are used to store the community detection results 
 
 #tidygraph
 nodes <- st_read(paste0("../data/", chosen_city,"/msoa_lon_lat.shp"))
@@ -47,43 +24,50 @@ graph <- as_tbl_graph(edges, directed = FALSE)
 graph_louvain <- graph %>%  activate(nodes) %>%
       mutate(group = group_louvain(weights = `potential_demand`))
 # extract nodes so that you can join group results onto the M
-graph_nodes <- graph_louvain %>% activate("nodes") %>% as_tibble()
+community_assignment <- graph_louvain %>% activate("nodes") %>% as_tibble()
 # join group result to each MSOA
-nodes <- nodes %>% dplyr::left_join(graph_nodes, by =  c("msoa11cd" = "name"))
+nodes <- nodes %>% dplyr::left_join(community_assignment, by =  c("msoa11cd" = "name"))
 
 # count number of MSOAs in each group
-edge_clusters <- nodes %>% st_drop_geometry() %>%
+nodes %>% st_drop_geometry() %>%
   group_by(group) %>% 
   summarize(count = n()) %>% arrange(desc(count))
 
-plot(st_geometry(graph_t), col = "lightgrey")
-plot(nodes['group'])
+# read in msoa border geometry 
+msoa_borders <- st_read(paste0("../data/", chosen_city,"/msoas_geometry.shp"))
 
-# read in msoa geometry
-msoas <- st_read(paste0("../data/", chosen_city,"/msoas_geometry.shp"))
-
-
-graph_t <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows_default.RDS"))
-graph_t <- graph_t %>% dplyr::select(flow)
-
-plot(st_geometry(msoas), col = "lightgrey")
-plot(st_geometry(graph_t), add = TRUE)
+plot(st_geometry(msoa_borders))
+plot(nodes['group'], add = TRUE)
 
 
+# read in road edges with aggregated flow data 
+road_segments <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows_default.RDS"))
+#road_segments <- road_segments %>% dplyr::select(flow)
 
+# plot
+plot(st_geometry(msoa_borders))
+plot(st_geometry(road_segments), add = TRUE, col = "darkred")
 
-# ASSIGNING ROAD EDGES TO MSOAS. 
+# We need to assign a community to each edge. I am doing this in two steps:
+
+# 1. Assign each edge to an MSOA
+# 2. Assign each edge to the same community of its MSOA
+
+###### PART 1: FUNCTION FOR ASSIGNING ROAD EDGES TO MSOAS #######
+
 # Below function does the following:
  # if road segment does not intersect with any msoa border, snap it to the nearesr msoa centroid
  # if road segment interect (crosses) more than one msoa border, calculate the length of intersection with
  # with all intersecting MSOAs and assign it to the one it intersect with most
  # if road segment falls completely within one msoa, assign it to that msoa
 
-assign_edge_to_polygon = function(x, y, z, column) {
+assign_edge_to_polygon = function(x, y, z) {
   # x = sf with linestring features (road edges)
   # y = sf with polygon features (msoa borders)
   # z = sf with point features (msoa centroids)
-  # this function requires a column in y and z named msoa11cd!!!!
+                   ##############
+  #### this function requires a column in y and z named msoa11cd!!!! ####
+                  ###############
   if (inherits(x, "sf")) n = nrow(x)
   if (inherits(x, "sfc")) n = length(x)
   
@@ -120,17 +104,63 @@ assign_edge_to_polygon = function(x, y, z, column) {
   return(out)
 }
 
+# use function to assign each edge to an msoa. length of result = length of x
+edge_msoas <- assign_edge_to_polygon(x =road_segments, y = msoa_borders, z = nodes)
+# rename the column before binding
+edge_msoas <- edge_msoas %>% rename(assigned_msoa = value) 
 
-edge_msoas <- assign_edge_to_polygon(graph_t, msoas, nodes)
+# bind results to original road_segments sf
+road_segments <- dplyr::bind_cols(road_segments, edge_msoas)
 
-graph_t <- dplyr::bind_cols(graph_t, edge_msoas)
-
-plot(st_geometry(msoas))
+# plot for quick inspection
+plot(st_geometry(msoa_borders))
 plot(st_geometry(nodes), col = "grey", add = TRUE)
-plot(graph_t['value'], add=TRUE)
+plot(road_segments['assigned_msoa'], add=TRUE)
 
+###### PART 2: ASSIGN EACH EDGE TO THE SAME COMMUNITY AS ITS ASSOCIATED MSOA #######
 
+road_segments <- road_segments %>% dplyr::left_join(community_assignment, by =  c("assigned_msoa" = "name"))
+
+# quick plot
+plot(road_segments['group'])
+
+###### MAPPING ######
+
+# 1. map of msoa centroids colored by community
+
+# convert to character for legend
+nodes$Community <- as.character(nodes$group)
+
+tm_shape(msoa_borders) +
+  tm_borders(col = "grey80") +
+  tm_shape(nodes) +
+  tm_dots(col = "Community",
+          size = 0.1,
+          palette = "Set1") +
+  tm_layout(fontfamily = 'Georgia',
+            frame = FALSE)
+
+# 2. map of road segments colored by community
+
+# convert group column to categorical so that we don't get 1-1.5, 2-2.5 etc in the legend
+road_segments$Community <- as.character(road_segments$group)
+
+tm_shape(road_segments) +
+  tm_lines(#title = "Community",
+          col = "Community",
+          palette = "Set1") +
+  tm_layout(fontfamily = 'Georgia',
+            frame = FALSE)
+
+# can do a tmap arrange here but am I bovered?!
+
+# CLEAR ENVIRONMENT!!!
 
 
 # to check which features do not intersect at all with MSOAS #id:423
-mapview::mapview(bind, zcol="value") + mapview::mapview(msoas)
+# mapview::mapview(road_segments, zcol="assigned_msoa") + 
+#   mapview::mapview(msoa_borders)
+
+
+
+
