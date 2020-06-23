@@ -5,7 +5,7 @@ library(tidyverse)
 library(tmap)
 
 
-###### COMMUNITY DETECTION ######
+################ 1. COMMUNITY DETECTION #################
 
 # edges are the msoa od pairs. 
 # nodes are the msoa centroids
@@ -48,12 +48,14 @@ road_segments <- readRDS(paste0("../data/", chosen_city,"/graph_with_flows_defau
 plot(st_geometry(msoa_borders))
 plot(st_geometry(road_segments), add = TRUE, col = "darkred")
 
+############### 2. ASSIGNING COMMUNITIES TO EDGES ###############
+
 # We need to assign a community to each edge. I am doing this in two steps:
 
 # 1. Assign each edge to an MSOA
 # 2. Assign each edge to the same community of its MSOA
 
-###### PART 1: FUNCTION FOR ASSIGNING ROAD EDGES TO MSOAS #######
+########## 2.1: FUNCTION FOR ASSIGNING ROAD EDGES TO MSOAS ###########
 
 # Below function does the following:
  # if road segment does not intersect with any msoa border, snap it to the nearesr msoa centroid
@@ -117,14 +119,14 @@ plot(st_geometry(msoa_borders))
 plot(st_geometry(nodes), col = "grey", add = TRUE)
 plot(road_segments['assigned_msoa'], add=TRUE)
 
-###### PART 2: ASSIGN EACH EDGE TO THE SAME COMMUNITY AS ITS ASSOCIATED MSOA #######
+###### 2.2: ASSIGN EACH EDGE TO THE SAME COMMUNITY AS ITS ASSOCIATED MSOA #######
 
 road_segments <- road_segments %>% dplyr::left_join(community_assignment, by =  c("assigned_msoa" = "name"))
 
 # quick plot
 plot(road_segments['group'])
 
-###### MAPPING ######
+#################### 3. MAPPING  ######################
 
 # 1. map of msoa centroids colored by community
 
