@@ -126,6 +126,10 @@ road_segments <- road_segments %>% dplyr::left_join(community_assignment, by =  
 # quick plot
 plot(road_segments['group'])
 
+# save as an RDS to work with in the next script
+saveRDS(road_segments, file = paste0("../data/", chosen_city, "/graph_with_flows_default_communities.Rds"))
+
+
 #################### 3. MAPPING  ######################
 
 # 3.1. map of msoa centroids colored by community
@@ -138,9 +142,9 @@ tm_shape(msoa_borders) +
   tm_shape(nodes) +
   tm_dots(col = "Community",
           size = 0.1,
-          palette = "Set1") +
+          palette = "Dark2") +
   tm_layout(fontfamily = 'Georgia',
-            legend.show=FALSE,
+            legend.show = FALSE,
             frame = FALSE) -> tm1
 
 # 3.2. map of road segments colored by community
@@ -151,25 +155,51 @@ road_segments$Community <- as.character(road_segments$group)
 tm_shape(road_segments) +
   tm_lines(#title = "Community",
           col = "Community",
-          palette = "Set1") +
+          palette = "Dark2") +
   tm_layout(fontfamily = 'Georgia',
-            legend.show=FALSE,
+            legend.show =FALSE,
             frame = FALSE) -> tm2
 
 # 3.3  get legend only for facet map
 tm_shape(road_segments) +
   tm_lines(col = "Community",
-           palette = "Set1") +
+           palette = "Dark2") +
   tm_layout(fontfamily = 'Georgia',
             legend.only=TRUE,
             frame = FALSE) -> tm_leg
 
 # can do a tmap arrange here but am I bovered?!
-tmap_arrange(tm1, tm2, tm_leg, nrow=1)
+tm_facet <- tmap_arrange(tm1, tm2, tm_leg, nrow=1)
 
+#save
+tmap_save(tm = tm_facet, filename = paste0("../data/", chosen_city,"/Plots/communities.png"), 
+          width=8.5, height=4)
+
+# 3.4  MSOAs as cloropleth/choropleth/whatever
+
+# add communitiy column to polygon geometry to create cloropleth map
+msoa_borders <- nodes %>% 
+  st_drop_geometry %>% 
+  dplyr::select(msoa11cd, Community) %>%
+  right_join(msoa_borders, by = 'msoa11cd') %>%
+  st_as_sf()
+
+
+tm_shape(msoa_borders) +
+  tm_fill(col = "Community",
+             palette = "Dark2") +
+  tm_layout(fontfamily = 'Georgia',
+            legend.show = FALSE,
+            frame = FALSE) -> tm3
+
+tm_facet2 <- tmap_arrange(tm3, tm2, tm_leg, nrow=1)
+
+tmap_save(tm = tm_facet2, filename = paste0("../data/", chosen_city,"/Plots/communities_alternative.png"), 
+          width=8.5, height=4)
 
 # CLEAR ENVIRONMENT!!!
-
+rm(community_assignment, edge_msoas, edges, graph, graph_louvain, msoa_borders, nodes, road_segments,
+   tm_facet, tm_facet2, tm_leg, tm1, tm2, tm3, assign_edge_to_polygon)
 
 # to check which features do not intersect at all with MSOAS #id:423
 # mapview::mapview(road_segments, zcol="assigned_msoa") + 

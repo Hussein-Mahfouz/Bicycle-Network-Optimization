@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592993446678.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E7398D9A",
+    "lastKnownWriteTime" : 4367761949,
+    "last_content_update" : 1592993446678,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "7C83B52F",
+        "caption" : "graph_sf",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=graph_sf&cache_key=7C83B52F",
+        "displayedObservations" : 3738,
+        "environment" : "",
+        "expression" : "graph_sf",
+        "object" : "graph_sf",
+        "preview" : 0,
+        "totalObservations" : 3738,
+        "variables" : 23
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 13,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
