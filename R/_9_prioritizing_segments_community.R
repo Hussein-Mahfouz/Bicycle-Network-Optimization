@@ -3,39 +3,6 @@ library(sf)
 graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_default_communities.RDS"))
 
 
-
-
-
-x <- graph_sf
-#get edge_id of edge with highest flow
-edge_sel <- x$edge_id[which.max(x$flow)]
-
-# Group by community and get the edge with the highest flow in each group
-t <- x %>% group_by(Community) %>% top_n(1, flow)
-# above might return more than one edge per group (edges tied for highest flow), so here we group the 
-# result by Community and select the longer edge
-t2 <- t %>% group_by(Community) %>% top_n(1, d) %>%
-  dplyr::mutate(sequence = 0)
-
-t2 <- x %>% group_by(Community) %>% 
-  top_n(1, flow) %>% 
-  select(edge_id)
-
-
-
-
-
-
-
-
-
-neighb_id <- graph_sf$edge_id[which(graph_sf$from_id %in% t$from_id | 
-                                      graph_sf$from_id %in% t$to_id |
-                                      graph_sf$to_id %in% t$from_id | 
-                                      graph_sf$to_id %in% t$to_id)]
-
-
-
 ################################################ FUNCTION 1 ################################################
 ###########################################################################################################  
 ### THIS FUNCTION IDENTIFIES THE EDGE WITH THE HIGHEST FLOW IN EACH COMMUNITY. THESE EDGES ACT AS ###
@@ -96,10 +63,14 @@ growth_community <- function(graph, km, col_name) {
 }
 
 
-test <- growth_community(graph_sf, 20, "flow")
+test <- growth_community(graph_sf, 50, "flow")
 
 plot(st_geometry(graph_sf), col = 'lightgrey')
 plot(test["sequen"], add = TRUE)
+
+plot(st_geometry(graph_sf), col = 'lightgrey')
+plot(test["Community"], add = TRUE)
+
 
 #dplyr::filter isn't working so filtering with base r
 test2 <- test[test$sequen <= 30,]
@@ -230,8 +201,6 @@ plot(test["Community"])
 ###############################################################
 
 
-
-
 growth_community_3 <- function(graph, km) {
   # copy of graph to edit
   x <- graph
@@ -306,8 +275,6 @@ growth_community_3 <- function(graph, km) {
   }
   return(x)
 }
-
-
 
 test <- growth_community_3(graph_sf, 50)
 
