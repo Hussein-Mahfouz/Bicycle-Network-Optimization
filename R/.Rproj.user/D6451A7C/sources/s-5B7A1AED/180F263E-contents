@@ -140,6 +140,9 @@ growth_existing_infra <- function(graph, km, col_name) {
 }
 
 test <- growth_existing_infra(graph_sf, 50, "flow")
+# check km argument was respected 
+test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
+
 
 plot(st_geometry(graph_sf), col = 'lightgrey')
 plot(test["sequen"], add = TRUE)
@@ -215,6 +218,10 @@ growth_community <- function(graph, km, col_name) {
 
 
 test <- growth_community(graph_sf, 50, "flow")
+# check km argument was respected 
+test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
+
+
 # let's see if the seeds were correct. Main concern is to see if passing column name to the function worked
 test_0 <- test %>% dplyr::filter(sequen == 0)
 plot(test_0["Community"])
@@ -225,9 +232,9 @@ plot(test["sequen"], add = TRUE)
 plot(st_geometry(graph_sf), col = 'lightgrey')
 plot(test["Community"], add = TRUE)
 
-
+# let's see which edges grow first
 #dplyr::filter isn't working so filtering with base r
-test2 <- test[test$sequen <= 10,]
+test2 <- test[test$sequen <= 30,]
 plot(test2["sequen"])
      
 plot(st_geometry(graph_sf), col = 'lightgrey')
@@ -550,7 +557,7 @@ growth_community_4 <- function(graph, km, col_name) {
   return(x)
 }
 
-test <- growth_community_4(graph_sf, 520, "flow")
+test <- growth_community_4(graph_sf, 50, "flow")
 
 test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
 
@@ -559,8 +566,8 @@ plot(test["Community"], add = TRUE)
 plot(test["Community"])
 plot(test["sequen"])
 
-
-
+# clear environment. Keep functions for next script 
+rm(test, test_0, test2, graph_sf)
 
 
 #n_distinct(y$group) < n_distinct(graph_sf$group)
