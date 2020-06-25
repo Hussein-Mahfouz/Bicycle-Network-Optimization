@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1593101202027.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "AD2D385C",
+    "lastKnownWriteTime" : 1593101242,
+    "last_content_update" : 1593101242693,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/_8.1_plotting_network_growth.R",
+    "project_path" : "_8.1_plotting_network_growth.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
