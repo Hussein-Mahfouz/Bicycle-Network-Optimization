@@ -61,10 +61,10 @@ ggsave(paste0("../data/", chosen_city,"/Plots/satisfied_km_all_flow_column.png")
 
 # community level plots
 ggplot(data=grow_flow_c, 
-       aes(x=dist_c_comm, y=perc_person_km_comm_c, group=Community, color = Community)) +
+       aes(x=dist_c, y=perc_person_km_comm_c, group=Community, color = Community)) +
   geom_line() + 
   ggtitle("Connected growth - investment distributed \nequally between communities") +
-  labs(x = "Length of Investment in Community (km)", y = "% of person km satisfied",
+  labs(x = "Total Length of Investment (km)", y = "% of person km satisfied",
        subtitle="Segments Prioritized Based On **Flow**") +
   theme_minimal() +
   theme(plot.title = element_text(size = 14)) +
@@ -134,10 +134,10 @@ ggsave(paste0("../data/", chosen_city,"/Plots/satisfied_km_all_person_km_column.
 
 
 ggplot(data=grow_person_km_c, 
-       aes(x=dist_c_comm, y=perc_person_km_comm_c, group=Community, color = Community)) +
+       aes(x=dist_c, y=perc_person_km_comm_c, group=Community, color = Community)) +
   geom_line() + 
   ggtitle("Connected growth - investment distributed \nequally between communities ") +
-  labs(x = "Length of Investment in Community (km)", y = "% of Person km Satisfied",
+  labs(x = "Total Length of Investment (km)", y = "% of Person km Satisfied",
        subtitle="Segments Prioritized Based On **Person km** Satisfied") +
   theme_minimal() +
   theme(plot.title = element_text(size = 14)) +

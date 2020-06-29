@@ -49,9 +49,8 @@ growth_one_seed <- function(graph, km, col_name) {
     mutate(sequen= 0)
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
-  if (x$cycle_infra == 0) {
-    j <- x$d} else {
-      j <- 0}
+  # j counts km added. We don't count segments that already have cycling infrastructure
+  j <- sum(x$d) - sum(x$cycle_infra * x$d)
   
   #while length of chosen segments is less than specified length 
   while (j/1000 < km){
@@ -75,8 +74,7 @@ growth_one_seed <- function(graph, km, col_name) {
     i = i+1
     # Only count length of selected edges that have no cycling infrastructure.
     # if condition is not met, j will not be changed in this iteration
-    if (edge_next$cycle_infra == 0) {
-      j = j + edge_next$d} 
+    j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
   }
   return(x)
 }
@@ -111,6 +109,12 @@ growth_existing_infra <- function(graph, km, col_name) {
   # get all edges with cycling infrastructure - these are the starting point
   x <- graph %>% dplyr::filter(cycle_infra == 1) %>%
     dplyr::mutate(sequen = 0)
+  # we need a network representation to get no. of components and size of gcc using igraph
+  net <- as_sfnetwork(x)
+  # calculate no of components in the solution
+  x <- x %>%  mutate(no_components = igraph::count_components(net),
+                     # to get size largest connected component 
+                     gcc_size = components(net)$csize[which.max(components(net)$csize)])
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
   # j counts km added. We don't count segments that already have cycling infrastructure
@@ -129,9 +133,15 @@ growth_existing_infra <- function(graph, km, col_name) {
     neighb <- remaining %>% filter(edge_id %in% neighb_id)
     # get id of best neighboring edge
     edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
+    # we need a network representation to get no. of components and size of gcc using igraph
+    net <- as_sfnetwork(x)
     # get nest neighboring edge as df row
     edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-      mutate(sequen = i)
+      mutate(sequen = i,
+             # calculate no of components in the solution up to this point
+             no_components = igraph::count_components(net),
+             # to get size largest connected component 
+             gcc_size = components(net)$csize[which.max(components(net)$csize)])
     # append it to the solution
     x <- rbind(x, edge_next)
     
