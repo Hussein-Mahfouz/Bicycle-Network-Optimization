@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1593444808233.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "CBAD33C4",
+    "lastKnownWriteTime" : 98784247812,
+    "last_content_update" : 1593444808233,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "1FD72E56",
+        "caption" : "grow_flow_infra",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=grow_flow_infra&cache_key=1FD72E56",
+        "displayedObservations" : "3723",
+        "environment" : "",
+        "expression" : "grow_flow_infra",
+        "object" : "grow_flow_infra",
+        "preview" : "0",
+        "totalObservations" : "3723",
+        "variables" : "34"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 13,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

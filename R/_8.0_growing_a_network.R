@@ -1,8 +1,9 @@
 library(igraph)
 library(sf)
 library(sfnetworks)
+library(tidyverse)
 
-graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_default_communities.RDS"))
+# graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_default_communities.RDS"))
 
 
 ##### FUNCTION TO CHECK IF THE INVESTMENT LENGTH CHOSEN IS REASONABLE. IT SHOULD BE LESS THAN THE TOTAL KM
@@ -81,13 +82,13 @@ growth_one_seed <- function(graph, km, col_name) {
 }
 
 
-test <- growth_one_seed(graph_sf, 50, "flow")
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["sequen"], add = TRUE)
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["Community"], add = TRUE)
+# test <- growth_one_seed(graph_sf, 50, "flow")
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["sequen"], add = TRUE)
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["Community"], add = TRUE)
 
 
 ################################################ FUNCTION 2 ################################################
@@ -141,16 +142,16 @@ growth_existing_infra <- function(graph, km, col_name) {
   return(x)
 }
 
-test <- growth_existing_infra(graph_sf, 50, "flow")
-# check km argument was respected 
-test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
-
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["sequen"], add = TRUE)
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["Community"], add = TRUE)
+# test <- growth_existing_infra(graph_sf, 50, "flow")
+# # check km argument was respected 
+# test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
+# 
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["sequen"], add = TRUE)
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["Community"], add = TRUE)
 
                 ################ FUNCTIONS THAT UTILIZE COMMUNITY DETECTION ################
 
@@ -219,28 +220,28 @@ growth_community <- function(graph, km, col_name) {
 }
 
 
-test <- growth_community(graph_sf, 50, "flow")
-# check km argument was respected 
-test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
-
-
-# let's see if the seeds were correct. Main concern is to see if passing column name to the function worked
-test_0 <- test %>% dplyr::filter(sequen == 0)
-plot(test_0["Community"])
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["sequen"], add = TRUE)
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["Community"], add = TRUE)
-
-# let's see which edges grow first
-#dplyr::filter isn't working so filtering with base r
-test2 <- test[test$sequen <= 30,]
-plot(test2["sequen"])
-     
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test2["sequen"], add = TRUE)
+# test <- growth_community(graph_sf, 50, "flow")
+# # check km argument was respected 
+# test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
+# 
+# 
+# # let's see if the seeds were correct. Main concern is to see if passing column name to the function worked
+# test_0 <- test %>% dplyr::filter(sequen == 0)
+# plot(test_0["Community"])
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["sequen"], add = TRUE)
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["Community"], add = TRUE)
+# 
+# # let's see which edges grow first
+# #dplyr::filter isn't working so filtering with base r
+# test2 <- test[test$sequen <= 30,]
+# plot(test2["sequen"])
+#      
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test2["sequen"], add = TRUE)
 
 ################################################ FUNCTION 4 ################################################
 ###########################################################################################################  
@@ -254,8 +255,9 @@ plot(test2["sequen"], add = TRUE)
 # 2. Identify edge with highest flow in each community
 # 3. Add these edges to solution
 # 4. For edges in each community
-#      - identify edges that neighbor the edges in the solution from that community
-#      - Select edge with highest flow and append it to the solution
+#      i. identify all edges from that community that [a] have not yet been chsen AND [b] neighbor the edges 
+#        in the current solution 
+#      ii. Select edge from i with highest flow and append it to the solution
 # 5. Keep looping over the communities and selecting edges until you reach the investment length
 # 6. If there are no neighboring edges remaining for a community, skip it
 # 7. If there are no neighboring edges remaining for all communities, break out early and return the solution so
@@ -269,7 +271,7 @@ growth_community_2 <- function(graph, km, col_name) {
   
   # copy of graph to edit
   x <- graph
-  # Group by community and get the edge with the highest flow in each group
+  # Group by community and get the edge with the highest flow in each group ( !! sym(col_name) used to point to col_name variable in function)
   x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name))
   # above might return more than one edge per group (edges tied for highest flow), so here we group the 
   # result by Community and select the longer edge
@@ -346,13 +348,13 @@ growth_community_2 <- function(graph, km, col_name) {
 }
 
 
-test <- growth_community_2(graph_sf, 500, "flow")
-
-test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["Community"], add = TRUE)
-plot(test["Community"])
+# test <- growth_community_2(graph_sf, 500, "flow")
+# 
+# test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["Community"], add = TRUE)
+# plot(test["Community"])
 
 
 
@@ -457,13 +459,13 @@ growth_community_3 <- function(graph, km, col_name) {
   return(x)
 }
 
-test <- growth_community_3(graph_sf, 50, "flow")
-
-test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["Community"], add = TRUE)
-plot(test["Community"])
+# test <- growth_community_3(graph_sf, 50, "flow")
+# 
+# test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["Community"], add = TRUE)
+# plot(test["Community"])
 
 
 ################################################ FUNCTION 6 ################################################
@@ -487,9 +489,6 @@ plot(test["Community"])
 # At each iteration we calculate the no of components that make up the current solution. We start with all cycling
 # infrastructure and then as edges are added, the number of components should go down
 
-####### TO DO ######
-# FIND WHY THIS DOESN'T WORK WHEN LENGTH APPROACHES NETWORK LENGTH
-# ADD SIZE OF LARGEST CONNECTED COMPONENT (LENGTH / TOTAL NETWORK LENGTH)
 growth_community_4 <- function(graph, km, col_name) {
   
   ### check if km chosen is a reasonable number. Function is defined in the beginning
@@ -510,8 +509,12 @@ growth_community_4 <- function(graph, km, col_name) {
   x <- rbind(x, y)
   # remove duplicates
   x <- dplyr::distinct(x, edge_id, .keep_all = TRUE) 
+  # we need a network representation to get no. of components and size of gcc using igraph
+  net <- as_sfnetwork(x)
   # calculate no of components in the solution
-  x <- x %>%  mutate(no_components = igraph::count_components(as_sfnetwork(x)))
+  x <- x %>%  mutate(no_components = igraph::count_components(net),
+                     # to get size largest connected component 
+                     gcc_size = components(net)$csize[which.max(components(net)$csize)])
   
   # split the graph into a list of dataframes with length = number of communities
   split <- graph %>%
@@ -531,6 +534,8 @@ growth_community_4 <- function(graph, km, col_name) {
       chosen    <- split[[k]] %>% filter((edge_id %in% x$edge_id))
       # edges in community k that have not been chosen yet
       remaining <- split[[k]] %>% filter(!(edge_id %in% x$edge_id))
+      # we need a network representation to get no. of components and size of gcc using igraph
+      net <- as_sfnetwork(x)
       # if there are still edges in the community to be selected 
       if (nrow(remaining) > 0){
         # all edges that neighbor the edges in the community that have already been chosen
@@ -551,7 +556,9 @@ growth_community_4 <- function(graph, km, col_name) {
           edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
             mutate(sequen = i,
                    # calculate no of components in the solution up to this point
-                   no_components = igraph::count_components(as_sfnetwork(x)))
+                   no_components = igraph::count_components(net),
+                   # to get size largest connected component 
+                   gcc_size = components(net)$csize[which.max(components(net)$csize)])
           # append edge to the solution
           x <- rbind(x, edge_next)
           
@@ -563,7 +570,9 @@ growth_community_4 <- function(graph, km, col_name) {
           edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
             mutate(sequen = i,
                    # calculate no of components in the solution up to this point
-                   no_components = igraph::count_components(as_sfnetwork(x)))
+                   no_components = igraph::count_components(net),
+                   # to get size largest connected component 
+                   gcc_size = components(net)$csize[which.max(components(net)$csize)])
           # append edge to the solution
           x <- rbind(x, edge_next)
           # Only count length of selected edges that have no cycling infrastructure.
@@ -580,24 +589,35 @@ growth_community_4 <- function(graph, km, col_name) {
   return(x)
 }
 
-test <- growth_community_4(graph_sf, 50, "flow")
 
-test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
-
-plot(st_geometry(graph_sf), col = 'lightgrey')
-plot(test["Community"], add = TRUE)
-plot(test["Community"])
-plot(test["sequen"])
+#debugging - START
+# graph_sf %>% st_drop_geometry %>% group_by(Community, cycle_infra) %>% summarize(length = sum(d)/ 1000)
+# graph_sf %>% st_drop_geometry %>% summarize(length = sum(d)/ 1000)
+# graph_sf %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d)/ 1000)
+# graph_sf %>% st_drop_geometry %>% filter(cycle_infra ==0) %>% group_by(Community) %>% summarize(length = sum(d)/ 1000)
+# graph_sf %>% st_drop_geometry %>% filter(cycle_infra ==0) %>%  summarize(length = sum(d)/ 1000)
+# f <-graph_sf %>% st_drop_geometry %>% filter(cycle_infra ==1) 
+# 
+# 
+# test <- growth_community_4(graph_sf, 400, "flow")
+# 
+# graph_sf %>% st_drop_geometry %>% filter(cycle_infra ==0) %>% group_by(Community) %>% summarize(length = sum(d)/ 1000)
+# test %>% ungroup %>% st_drop_geometry %>% filter(cycle_infra ==0) %>% group_by(Community) %>% summarize(length = sum(d)/ 1000)
+# 
+# 
+# 
+# test %>% st_drop_geometry %>% group_by(cycle_infra) %>% summarize(length = sum(d))
+# 
+# plot(st_geometry(graph_sf), col = 'lightgrey')
+# plot(test["Community"], add = TRUE)
+# plot(test["Community"])
+# plot(test["sequen"])
 
 # clear environment. Keep functions for next script 
 rm(test, test_0, test2, graph_sf)
 
 
-
-
-
-
-
-
+## adding igraph connected components function takes double the time 
+#system.time({ growth_community_4(graph_sf, 30, "flow") })
 
 

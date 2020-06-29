@@ -29,7 +29,7 @@ dist_tr <- graph_sf_trunk %>% st_drop_geometry() %>%
   group_by(highway) %>%
   summarize(dist = sum(d*flow) /1000,         
             dist_perc = ((sum(d*flow)) / mean(sum_weighted_dist)) * 100) %>% 
-  mutate(weighting = 'trunk')
+  mutate(weighting = 'trunk permitted')
 
 
 dist_unw <- graph_sf_unweight %>% st_drop_geometry() %>%
@@ -56,26 +56,27 @@ person_km <- person_km %>%
 # plot % of person-km on each highway type
 ggplot(data=person_km , aes(x=highway, y=dist_perc, group=factor(weighting), fill=factor(weighting))) +
     geom_col(position=position_dodge(0.7), colour="black") +
-    ggtitle("Percentage of Total Flow Traversing \nDifferent Highway Types") +
+    ggtitle("Percentage of Total Flow Traversing Different Highway Types") +
     labs(x = "Highway Type", y = "% of Total Flow", fill = "weighting") +
     scale_y_continuous(labels = scales::comma_format()) +                         # add comma to y labels
-    scale_fill_brewer(palette = "Greys", name="Weighting Profile") +                                        # for nice color schemes
+    scale_fill_brewer(palette = "Greys", name="Weighting Profile" , direction=-1) +                                        # for nice color schemes
     # edit angle of text, hjust argument so that text stays below plot AND center plot title
-    theme(axis.text.x = element_text(angle=50, hjust=1), plot.title = element_text(hjust = 0.5)) + 
+    theme_minimal() +
+    #theme(axis.text.x = element_text(angle=50, hjust=1), plot.title = element_text(hjust = 0.5)) + 
     coord_flip() -> p
-
 p
 ggsave(path = paste0("../data/", chosen_city,"/Plots"), file="perc_person-km-per-highway-type.png", p, width = 10, height = 6)
 
 # plot person-km on each highway type
 ggplot(data=person_km , aes(x=highway, y=dist, group=factor(weighting), fill=factor(weighting))) +
   geom_col(position=position_dodge(0.7), colour="black") +
-  ggtitle("Percentage of Total Flow Traversing \nDifferent Highway Types") +
+  ggtitle("Total Flow Traversing \nDifferent Highway Types (km)") +
   labs(x = "Highway Type", y = "% of Total Flow", fill = "weighting") +
   scale_y_continuous(labels = scales::comma_format()) +                         # add comma to y labels
-  scale_fill_brewer(palette = "Greys", name="Weighting Profile") +                                        # for nice color schemes
+  scale_fill_brewer(palette = "Greys", name="Weighting Profile", direction=-1) +          # for nice color schemes
+  theme_minimal() +
   # edit angle of text, hjust argument so that text stays below plot AND center plot title
-  theme(axis.text.x = element_text(angle=50, hjust=1), plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle=30, hjust=1), plot.title = element_text(hjust = 0.5)) + 
   coord_flip() -> p
 
 p
@@ -270,9 +271,9 @@ tm_shape(plot1) +
            scale = 3,  #multiply line widths by scale
            col = "darkgreen") +    
 tm_layout(fontfamily = 'Georgia',
-            # title = "Weight profile 1", # this works if you need it
-            # title.size = 1.2,
-            # title.color = "azure4",
+            title = "Default", # this works if you need it
+            title.size = 1,
+            title.color = "azure4",
             #inner.margins = c(0, 0, 0.03, 0),
             #legend.outside = TRUE,
             #legend.outside.position = "bottom",
@@ -281,7 +282,7 @@ tm_layout(fontfamily = 'Georgia',
             #legend.position = c("right", "bottom"),
             frame = FALSE)  -> p1
 
-plot2 <- graph_sf_unweight %>% 
+plot2 <- graph_sf_trunk %>% 
   dplyr::filter(highway == road_type)
 
 tm_shape(facet_2) +
@@ -292,9 +293,9 @@ tm_shape(facet_2) +
            scale = 3,  #multiply line widths by scale
            col = "darkgreen") +    
   tm_layout(fontfamily = 'Georgia',
-            # title = "Weight profile 2", # this works if you need it
-            # title.size = 1.2,
-            # title.color = "azure4",
+            title = "Trunk Permitted", # this works if you need it
+            title.size = 1,
+            title.color = "azure4",
             #inner.margins = c(0, 0, 0.03, 0),
             #legend.outside = TRUE,
             #legend.outside.position = "bottom",
@@ -304,7 +305,7 @@ tm_shape(facet_2) +
             frame = FALSE)  -> p2
 
 
-plot3 <- graph_sf_trunk %>% 
+plot3 <- graph_sf_unweight %>% 
   dplyr::filter(highway == road_type)
 
 tm_shape(facet_3) +
@@ -316,9 +317,9 @@ tm_shape(facet_3) +
            col = "darkgreen",
            legend.lwd.is.portrait = TRUE) +    
   tm_layout(fontfamily = 'Georgia',
-            # title = "Weight profile 3", 
-            # title.size = 1.2,
-            # title.color = "azure4",
+            title = "Unweighted", 
+            title.size = 1,
+            title.color = "azure4",
             #inner.margins = c(0, 0, 0.05, 0),
             #legend.outside = TRUE,
             #legend.outside.position = "right",
@@ -328,7 +329,7 @@ tm_shape(facet_3) +
             frame = FALSE)  -> p3
 
 ### legend only 
-tm_shape(plot3) +
+tm_shape(plot2) +
   tm_lines(lwd = "flow",
            scale = 3,  
            col = "darkgreen",
@@ -342,7 +343,7 @@ tm_shape(plot3) +
 facet_road_type <- tmap_arrange(p1, p2, p3, legend, nrow=1)
 
 
-tmap_save(tm = facet_road_type, filename = paste0("../data/", chosen_city,"/Plots/",road_type,"_facet3.png"),
+tmap_save(tm = facet_road_type, filename = paste0("../data/", chosen_city,"/Plots/",road_type,"_facet.png"),
           height=4, width= 9)
 
 
