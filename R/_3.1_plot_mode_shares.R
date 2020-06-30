@@ -1,12 +1,59 @@
 library(tidyverse)
-
+library(waffle)
 
 # read in the data
 flow <- readr::read_csv(paste0("../data/",chosen_city,"/flows_for_desire_lines.csv"))
 
-######## 
+#######################
+# PLOTTING MODE SHARE
+#######################
+
+# prepare data for mode share pie chart
+flow_pie <- flow %>% 
+  dplyr::select("All categories: Method of travel to work", "Work mainly at or from home",
+                       "Underground, metro, light rail, tram", "Train", "Bus, minibus or coach", "Taxi", 
+                       "Motorcycle, scooter or moped", "Driving a car or van", "Passenger in a car or van", "Bicycle",
+                       "On foot", "Other method of travel to work") %>% 
+  summarize_if(is.numeric, sum, na.rm=TRUE)    # get column sums
+
+# change to dataframe with key: value. Do some summaries and name changes 
+flow_pie <- flow_pie %>% 
+  mutate(`Public Transport` = `Underground, metro, light rail, tram` + Train + `Bus, minibus or coach`,
+          Car = `Driving a car or van` + `Passenger in a car or van`,
+          Other = `All categories: Method of travel to work` - (`Public Transport` + Car + Bicycle + `On foot`)) %>%
+  dplyr::select(`Public Transport`, Car, Bicycle, `On foot`, Other) %>%
+  t() %>%  # transpose to turn row into column
+  as.data.frame()  %>% # convert from matrix to dataframe
+  rownames_to_column() %>%   # turn rownames to first column
+  rename(value = V1, mode = rowname)
+
+ggplot(flow_pie, aes(x="", y=value, fill=mode)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) +
+  theme_void() # remove background, grid, numeric labels
+
+ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_pie.png"))
+
+
+# waffle chat
+flow_waffle <- flow_pie
+# change values to % so that we have 100 boxes in the waffle chart
+flow_waffle$value <- (flow_waffle$value / sum(flow_waffle$value)) * 100  
+# plot
+waffle(parts = flow_waffle , rows = 6, title = paste0("Mode Share - ", chosen_city), 
+       legend_pos = "bottom")  
+
+ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_waffle.png"))
+
+# ggplot(flow_waffle, aes(fill = mode, values = value)) +
+#   geom_waffle(color = "white", n_rows = 6) +
+#   scale_color_brewer(palette="Blues") +
+#   theme(panel.grid = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), panel.background = element_blank()) 
+
+##############
 # PLOTTING DISTANCE VS FLOW
-########
+##############
+
 #plot distance vs flow
 # remove intra flows
 flow_plot <- flow %>% dplyr::filter(`Area of residence` != `Area of workplace`)
@@ -155,9 +202,8 @@ ggsave(paste0("../data/", chosen_city,"/Plots/histogram_distance_cycling_potenti
 
 
 
-rm(flow, flow_plot, flow_long_all, flow_long_active, flow_long_bike, flow_long_motor, flow_long_private, 
+rm(flow, flow_pie, flow_waffle, flow_plot, flow_long_all, flow_long_active, flow_long_bike, flow_long_motor, flow_long_private, 
    flow_long_sustainable, flow_long_potential, histogram, cols)
-########
 
 
 
@@ -165,8 +211,3 @@ rm(flow, flow_plot, flow_long_all, flow_long_active, flow_long_bike, flow_long_m
 
 
 
-
-
-
-rm(flow, flow_plot, flow_long_active, flow_long_bike, flow_long_motor, flow_long_private, 
-   flow_long_sustainable, histogram, flow_potential, flow_long_potential)

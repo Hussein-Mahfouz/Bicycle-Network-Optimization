@@ -265,7 +265,7 @@ growth_community <- function(graph, km, col_name) {
 # 2. Identify edge with highest flow in each community
 # 3. Add these edges to solution
 # 4. For edges in each community
-#      i. identify all edges from that community that [a] have not yet been chsen AND [b] neighbor the edges 
+#      i. identify all edges from that community that [a] have not yet been chosen AND [b] neighbor the edges 
 #        in the current solution 
 #      ii. Select edge from i with highest flow and append it to the solution
 # 5. Keep looping over the communities and selecting edges until you reach the investment length

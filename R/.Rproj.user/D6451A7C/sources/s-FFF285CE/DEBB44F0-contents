@@ -120,7 +120,6 @@ grow_flow_existing_infra$gcc_size_perc <- (grow_flow_existing_infra$gcc_size / n
 grow_flow_existing_infra_c <- grow_flow_existing_infra %>% 
   ungroup %>%   # not sure why it is a grouped df. This only has an effect on the select argument
   filter(cycle_infra == 0) %>% # all edges with cycle infrastructure were added at the beginning
-  #st_drop_geometry() %>% 
   dplyr::select(Community, d, flow, highway, cycle_infra, sequen, perc_dist, perc_flow,
                 perc_person_km, perc_dist_comm, perc_flow_comm, perc_person_km_comm, no_components,
                 gcc_size, gcc_size_perc)
@@ -260,6 +259,41 @@ tm_shape(graph_sf) +
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_priority_all_FLOW.png"))
 
 
+# lets show where the 1st 100km selected are (to show distribution of resources across communities)
+grow_flow_existing_infra_c_100 <- grow_flow_existing_infra_c %>% dplyr::filter(dist_c <= 100)
+
+tm_shape(graph_sf) +
+  tm_lines(col = 'gray95') +
+  tm_shape(initial_infra) +
+  tm_lines(col = 'firebrick2',
+           lwd = 1.5) +
+  tm_facets(by="Community",
+            nrow = 1,
+            free.coords=FALSE)  +  # so that the maps aren't different sizes 
+  tm_shape(grow_flow_existing_infra_c_100) +
+  tm_lines(title.col = "Priority (km)",
+           col = 'dist_c', 
+           lwd = 'sequen_inv',
+           scale = 1.2,     #multiply line widths by X
+           palette = "-Blues",
+           #style = "cont",   # to get a continuous gradient and not breaks
+           legend.lwd.show = FALSE) +
+  tm_facets(by="Community",
+            nrow = 1,
+            free.coords=FALSE)  +  # so that the maps aren't different sizes
+  tm_layout(main.title = "Distribution of Initial 100km of Investment",        
+            main.title.size = 1.2,
+            main.title.color = "azure4",
+            main.title.position = c("left", "top"),
+            fontfamily = 'Georgia',
+            legend.outside.position = c("right", "bottom"),
+            frame = FALSE) +
+  # add legend for the existing cycling infrastructure
+  tm_add_legend(type = "line", labels = 'Existing Cycling Infrastructure', col = 'firebrick2', lwd = 1.5) -> p
+
+
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_facet_FLOW_100.png"), 
+          width=10, height=4)
 
 
 

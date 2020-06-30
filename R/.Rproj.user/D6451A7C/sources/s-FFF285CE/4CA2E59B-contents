@@ -70,8 +70,8 @@ ggsave(path = paste0("../data/", chosen_city,"/Plots"), file="perc_person-km-per
 # plot person-km on each highway type
 ggplot(data=person_km , aes(x=highway, y=dist, group=factor(weighting), fill=factor(weighting))) +
   geom_col(position=position_dodge(0.7), colour="black") +
-  ggtitle("Total Flow Traversing \nDifferent Highway Types (km)") +
-  labs(x = "Highway Type", y = "% of Total Flow", fill = "weighting") +
+  ggtitle("Total Person KM Traversing \nDifferent Highway Types") +
+  labs(x = "Highway Type", y = "Distance (km) Weighted By Flow", fill = "weighting") +
   scale_y_continuous(labels = scales::comma_format()) +                         # add comma to y labels
   scale_fill_brewer(palette = "Greys", name="Weighting Profile", direction=-1) +          # for nice color schemes
   theme_minimal() +
