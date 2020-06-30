@@ -237,9 +237,14 @@ ggplot(p, aes(x= dist, y=value, color = name)) +
   geom_smooth() + 
   labs(title = paste0('Distribution of Cycling Increase \nif Mode Share Reaches ', round(cycle_target*100), '%'),
        x="Commuting Distance (km)", y = "Cycling Mode Share (%)") + 
-  scale_color_discrete(name = "", labels = c("Potential", "Current"))
+  scale_color_manual(name = "", labels = c("Potential", "Current"), values=c("darkgreen", "darkred")) +
+  theme_minimal()
+  
 #save
 ggsave(paste0("../data/", chosen_city,"/Plots/cycling_increase_line.png"), width = 6, height = 6)
+
+
+
 
 # clear environment
 rm(city_centroids, city_geom, city_msoas, p, uptake_decay, uptake_decay_grouped, 

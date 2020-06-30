@@ -3,6 +3,10 @@ library(tidyverse)
 library(ggtext)
 library(tmap)
 
+#create a directory to store data related to this city (does nothing if directory already exists)
+dir.create(paste0("../data/", chosen_city, "/Plots/Growth_Results"), showWarnings = FALSE)
+
+
 graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_default_communities.RDS"))
 
 # we weigh the flow on each edge by its distance. We can then get how much of the commuter km are satisfied
@@ -60,7 +64,7 @@ ggplot(data=grow_flow_1_seed_c , aes(x=dist_c, y=perc_person_km_c)) +
   theme(plot.title = element_text(size = 14)) +
   theme(plot.subtitle = element_markdown(size = 10))
 
-ggsave(paste0("../data/", chosen_city,"/Plots/satisfied_km_all_flow_column_growth_one_seed.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_one_seed_satisfied_km_all_flow_column.png"))
 
 # community level plots
 ggplot(data=grow_flow_1_seed_c, 
@@ -73,7 +77,7 @@ ggplot(data=grow_flow_1_seed_c,
   theme(plot.title = element_text(size = 14)) +
   theme(plot.subtitle = element_markdown(size = 10))
 
-ggsave(paste0("../data/", chosen_city,"/Plots/satisfied_km_community_flow_column_growth_one_seed.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_one_seed_satisfied_km_community_flow_column.png"))
 
 
 # we want edges added first to have a thicker lineweight. I add a column to inverse the sequence because tmap
@@ -100,7 +104,7 @@ tm_shape(graph_sf) +
             legend.position = c("right", "bottom"),
             frame = FALSE) -> p
 
-tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/priority_all_growth_one_seed_FLOW.png"))
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_one_seed_priority_all_FLOW.png"))
 
 
 ########################################### FUNCTION 2: GROWTH FROM EXISTING INFRASTRUCTURE ###########################################
@@ -109,7 +113,6 @@ tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/priority_all
 # let's grow the network based on existing infrastructure
 grow_flow_existing_infra <- growth_existing_infra(graph = graph_sf, km = 500, col_name = "flow")
 
-# STOPPED HERE!!!!!
 
 # get % of edges in gcc
 grow_flow_existing_infra$gcc_size_perc <- (grow_flow_existing_infra$gcc_size / nrow(graph_sf)) * 100
@@ -123,6 +126,11 @@ grow_flow_existing_infra_c <- grow_flow_existing_infra %>%
                 gcc_size, gcc_size_perc)
 
 
+# We have filtered the dataframe to include only segments without cycling infrastructure. This is because we want 
+# to see the effect of adding these segments on the person_km satisfied. However, the initial person_km satisfied is not 0
+# but equal to that satisfied by existing infrastructure. We calculate those initial values and add them to the cumulative
+# percentages calculated
+
 # get the person_km satisfied by existing infrastructure
 initial_perc_satisfied_all <- grow_flow_existing_infra %>% 
   st_drop_geometry() %>% 
@@ -133,9 +141,9 @@ initial_perc_satisfied_comm <- grow_flow_existing_infra %>%
   st_drop_geometry() %>% 
   group_by(Community) %>%
   filter(cycle_infra == 1) %>% 
-  summarize(initial_perc_satisfied = sum(perc_person_km)) 
+  summarize(initial_perc_satisfied = sum(perc_person_km_comm)) 
 
-# CHANGE THE LAST LINE ABOVE. THESE ARE % OF TOTAL. WE WANT % OF COMMUNITY!!!
+
 
 # join the community values so that we can add them to cumsum so that % satisfied does not start at 0 
 grow_flow_existing_infra_c <- grow_flow_existing_infra_c %>%
@@ -168,7 +176,7 @@ ggplot(data=grow_flow_existing_infra_c , aes(x=dist_c, y=perc_person_km_c)) +
   scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) + 
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100))
 
-ggsave(paste0("../data/", chosen_city,"/Plots/satisfied_km_all_flow_column_growth_flow_existing_2.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_satisfied_km_all_flow_column.png"))
 
 # community level plots
 ggplot(data=grow_flow_existing_infra_c, 
@@ -183,7 +191,7 @@ ggplot(data=grow_flow_existing_infra_c,
   scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) + 
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100))
 
-ggsave(paste0("../data/", chosen_city,"/Plots/satisfied_km_community_flow_column_growth_flow_existing_2.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_satisfied_km_community_flow_column.png"))
 
 
 
@@ -200,7 +208,7 @@ ggplot(data=grow_flow_existing_infra_c , aes(x=dist_c, y=no_components)) +
   theme_minimal() +
   theme(plot.subtitle = element_markdown())
 
-ggsave(paste0("../data/", chosen_city,"/Plots/components_number_flow_growth_2.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_components_number_flow.png"))
 
 
 # network level plot showing size of gcc 
@@ -212,7 +220,7 @@ ggplot(data=grow_flow_existing_infra_c , aes(x=dist_c, y=gcc_size_perc)) +
   theme_minimal() +
   theme(plot.subtitle = element_markdown())
 
-ggsave(paste0("../data/", chosen_city,"/Plots/components_gcc_flow_growth_2.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_components_gcc_flow.png"))
 
 
 
@@ -249,7 +257,7 @@ tm_shape(graph_sf) +
   tm_add_legend(type = "line", labels = 'Existing Cycling Infrastructure', col = 'firebrick2', lwd = 2) -> p
 
 
-tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/priority_all_growth_existing_infra_2_FLOW.png"))
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_priority_all_FLOW.png"))
 
 
 

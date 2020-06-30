@@ -257,7 +257,7 @@ growth_community <- function(graph, km, col_name) {
 ###########################################################################################################  
 ### THIS FUNCTION ALSO SELECTS A SEED FROM EACH COMMUNITY. IN EACH ITERATION ONE EDGE FROM EACH COMMUNITY ###
 ### IS CHOSEN. THE CHOSEN EDGE MUST BE CONNECTED TO THE EDGES IN THE COMMUNITY THAT HAVE ALREADY BEEN ###
-### CHOSEN. IF THERE ARE NO MORE EDGES IN TA PARTICULAR COMMUNITY, THE FUNCTION SKIPS OVER THAT COMMUNITY ###
+### CHOSEN. IF THERE ARE NO MORE EDGES IN A PARTICULAR COMMUNITY, THE FUNCTION SKIPS OVER THAT COMMUNITY ###
 ### AND CONTINUES WITH THE REMAINING COMMUNITIES
 ###########################################################################################################  
 
