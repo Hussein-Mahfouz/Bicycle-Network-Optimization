@@ -191,11 +191,17 @@ growth_community <- function(graph, km, col_name) {
   x <- graph
   # Group by community and get the edge with the highest flow in each group
   # to pass column name in function (specific to dplyr): https://stackoverflow.com/questions/48062213/dplyr-using-column-names-as-function-arguments
-  x <-  x %>% group_by(Community) %>% top_n(1, !! sym(col_name))
+  x <-  x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
   # above might return more than one edge per group (edges tied for highest flow), so here we group the 
   # result by Community and select the longer edge
   x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0)
+    dplyr::mutate(sequen = 0) %>% ungroup()
+  # # alternative method with slice max done twice
+  # x <- x %>% group_by(Community) %>%
+  #   slice_max(order_by = !! sym(col_name)) %>%
+  #   slice_max(order_by = d) %>%
+  #   dplyr::mutate(sequen = 0) %>%
+  #   ungroup()
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
   # j counts km added. We don't count segments that already have cycling infrastructure
@@ -282,11 +288,11 @@ growth_community_2 <- function(graph, km, col_name) {
   # copy of graph to edit
   x <- graph
   # Group by community and get the edge with the highest flow in each group ( !! sym(col_name) used to point to col_name variable in function)
-  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name))
+  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
   # above might return more than one edge per group (edges tied for highest flow), so here we group the 
   # result by Community and select the longer edge
   x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0)
+    dplyr::mutate(sequen = 0) %>% ungroup()
   ####################
   # split the graph into a list of dataframes with length = number of communities
   split <- graph %>%
@@ -398,11 +404,11 @@ growth_community_3 <- function(graph, km, col_name) {
   # copy of graph to edit
   x <- graph
   # Group by community and get the edge with the highest flow in each group
-  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name))
+  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
   # above might return more than one edge per group (edges tied for highest flow), so here we group the 
   # result by Community and select the longer edge
   x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0)
+    dplyr::mutate(sequen = 0) %>% ungroup()
   ####################
   # split the graph into a list of dataframes with length = number of communities
   split <- graph %>%
@@ -507,11 +513,11 @@ growth_community_4 <- function(graph, km, col_name) {
   # copy of graph to edit
   x <- graph
   # Group by community and get the edge with the highest flow in each group
-  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name))
+  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
   # above might return more than one edge per group (edges tied for highest flow), so here we group the 
   # result by Community and select the longer edge
   x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0)
+    dplyr::mutate(sequen = 0) %>% ungroup()
   # get all edges with cycling infrastructure
   y <- graph %>% dplyr::filter(cycle_infra == 1) %>%
     dplyr::mutate(sequen = 0)
