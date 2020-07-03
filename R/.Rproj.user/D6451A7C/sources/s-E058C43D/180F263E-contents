@@ -39,46 +39,46 @@ growth_one_seed <- function(graph, km, col_name) {
   
   ### check if km chosen is a reasonable number (using a predefined function)
   check_km_value(graph, km)
-  
-  # copy of graph to edit
-  x <- graph
+  # add an empty sequence column
+  graph <- graph %>% mutate(sequen= NA)
   #get edge_id of edge with highest flow
-  edge_sel <- x$edge_id[which.max(x[[col_name]])]
-  # prepare row for adding to new df
-  x <- x %>% filter(edge_id == edge_sel) %>% 
-    mutate(sequen= 0)
+  edge_sel <- graph$edge_id[which.max(graph[[col_name]])]
+  # assign a sequence  to the selected edge
+  #graph <- within(graph, sequen[edge_id == edge_sel] <- 0)
+  graph$sequen[graph$edge_id == edge_sel] <- 0
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
+  # we keep track of the edges in the solution, so that we can identify the edges that neighbor them
+  # edges in the solution are those that have been assigned a 'sequen' value
+  chosen <- graph %>% filter(!(is.na(sequen)))
   # j counts km added. We don't count segments that already have cycling infrastructure
-  j <- sum(x$d) - sum(x$cycle_infra * x$d)
-  
+  j <- sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
   #while length of chosen segments is less than specified length 
   while (j/1000 < km){
-    # remove rows that have already been selected
-    remaining <- graph %>% filter(!(edge_id %in% x$edge_id))
+    # candidate list for selection: remove rows that have already been selected (i.e. their sequen value is not NA)
+    remaining <- graph %>% filter(is.na(sequen))
     # identify road segments that neighbour existing selection
-    neighb_id <- graph$edge_id[which(graph$from_id %in% x$from_id | 
-                                       graph$from_id %in% x$to_id |
-                                       graph$to_id %in% x$from_id | 
-                                       graph$to_id %in% x$to_id)]
+    neighb_id <- graph$edge_id[which(graph$from_id %in% chosen$from_id | 
+                                       graph$from_id %in% chosen$to_id |
+                                       graph$to_id %in% chosen$from_id | 
+                                       graph$to_id %in% chosen$to_id)]
     # get neighbouring edges
     neighb <- remaining %>% filter(edge_id %in% neighb_id)
-    # get id of best neighboring edge
+    # get edge_id of best neighboring edge
     edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
-    # get nest neighboring edge as df row
-    edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-      mutate(sequen= i)
-    # append it to the solution
-    x <- rbind(x, edge_next)
-    
+    # assign a sequence to the selected edge
+    graph$sequen[graph$edge_id == edge_sel] <- i
+    # modify the 'chosen' sf so that it includes the new edge (new edge no longer has sequen == NA)
+    chosen <- graph %>% filter(!(is.na(sequen)))
+    # iterate sequence
     i = i+1
-    # Only count length of selected edges that have no cycling infrastructure.
-    # if condition is not met, j will not be changed in this iteration
-    j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+    # Update length of solution. Only count length of chosen edges (and don't count if edge has cycling infrastructure)
+    j = sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
   }
-  return(x)
+  # keep only edges/rows that have been chosen
+  graph <- graph %>% filter(!(is.na(sequen)))
+  return(graph)
 }
-
 
 # test <- growth_one_seed(graph_sf, 50, "flow")
 # 
@@ -105,51 +105,56 @@ growth_existing_infra <- function(graph, km, col_name) {
   
   ### check if km chosen is a reasonable number (using a predefined function)
   check_km_value(graph, km)
-
-  # get all edges with cycling infrastructure - these are the starting point
-  x <- graph %>% dplyr::filter(cycle_infra == 1) %>%
-    dplyr::mutate(sequen = 0)
+  # add empty columns for sequence, number of compenents in solution, and size of largest connected component
+  graph <- graph %>% mutate(sequen= NA,
+                            no_components = NA,
+                            gcc_size = NA)
+  # get all edges with cycling infrastructure - these are the starting point (sequen = 0)
+  graph$sequen[graph$cycle_infra == 1] <- 0
   # we need a network representation to get no. of components and size of gcc using igraph
-  net <- as_sfnetwork(x)
-  # calculate no of components in the solution
-  x <- x %>%  mutate(no_components = igraph::count_components(net),
-                     # to get size largest connected component 
-                     gcc_size = components(net)$csize[which.max(components(net)$csize)])
+  net <- graph  %>% filter(!(is.na(sequen))) %>% as_sfnetwork()
+  
+  # calculate no of components and size of largest connected component (for current solution)
+  graph$no_components[graph$cycle_infra == 1] <- igraph::count_components(net)
+  graph$gcc_size[graph$cycle_infra == 1] <- components(net)$csize[which.max(components(net)$csize)]
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
+  # we keep track of the edges in the solution, so that we can identify the edges that neighbor them
+  chosen <- graph %>% filter(!(is.na(sequen)))
   # j counts km added. We don't count segments that already have cycling infrastructure
-  j <- sum(x$d) - sum(x$cycle_infra * x$d)
+  j <- sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
   
   #while length of chosen segments is less than specified length 
   while (j/1000 < km){
-    # remove rows that have already been selected
-    remaining <- graph %>% filter(!(edge_id %in% x$edge_id))
+    # candidate list for selection: remove rows that have already been selected (i.e. sequen value is not NA)
+    remaining <- graph %>% filter(is.na(sequen))
     # identify road segments that neighbour existing selection
-    neighb_id <- graph$edge_id[which(graph$from_id %in% x$from_id | 
-                                       graph$from_id %in% x$to_id |
-                                       graph$to_id %in% x$from_id | 
-                                       graph$to_id %in% x$to_id)]
+    neighb_id <- graph$edge_id[which(graph$from_id %in% chosen$from_id | 
+                                       graph$from_id %in% chosen$to_id |
+                                       graph$to_id %in% chosen$from_id | 
+                                       graph$to_id %in% chosen$to_id)]
     # get neighbouring edges
     neighb <- remaining %>% filter(edge_id %in% neighb_id)
     # get id of best neighboring edge
     edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
+    # assign a sequence to the selected edge
+    graph$sequen[graph$edge_id == edge_sel] <- i
     # we need a network representation to get no. of components and size of gcc using igraph
-    net <- as_sfnetwork(x)
-    # get nest neighboring edge as df row
-    edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-      mutate(sequen = i,
-             # calculate no of components in the solution up to this point
-             no_components = igraph::count_components(net),
-             # to get size largest connected component 
-             gcc_size = components(net)$csize[which.max(components(net)$csize)])
-    # append it to the solution
-    x <- rbind(x, edge_next)
-    
+    net <- graph  %>% filter(!(is.na(sequen))) %>% as_sfnetwork()
+    # get no of components and size of largest connected component at this iteration
+    graph$no_components[graph$edge_id == edge_sel] <- igraph::count_components(net)
+    graph$gcc_size[graph$edge_id == edge_sel] <- components(net)$csize[which.max(components(net)$csize)]
+    # modify the 'chosen' sf so that it includes the new edge (new edge no longer has sequen == NA)
+    chosen <- graph %>% filter(!(is.na(sequen)))
+    # iterate sequence
     i = i+1
-    # Only count length of selected edges that have no cycling infrastructure.
-    j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+    # Update length of solution. Only count length of chosen edges (and don't count if edge has cycling infrastructure)
+    j = sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
+    
   }
-  return(x)
+  # keep only edges/rows that have been chosen
+  graph <- graph %>% filter(!(is.na(sequen)))
+  return(graph)
 }
 
 # test <- growth_existing_infra(graph_sf, 50, "flow")
@@ -181,60 +186,54 @@ growth_existing_infra <- function(graph, km, col_name) {
 # 6. Repeat steps 4 & 5 until the length of the edges in the solution reaches the investment length
 
 ###############################################################
-
 growth_community <- function(graph, km, col_name) {
   
   ### check if km chosen is a reasonable number (using a predefined function)
   check_km_value(graph, km)
   
-  # copy of graph to edit
-  x <- graph
+  # add sequen column
+  graph$sequen <- NA
   # Group by community and get the edge with the highest flow in each group
   # to pass column name in function (specific to dplyr): https://stackoverflow.com/questions/48062213/dplyr-using-column-names-as-function-arguments
-  x <-  x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
-  # above might return more than one edge per group (edges tied for highest flow), so here we group the 
-  # result by Community and select the longer edge
-  x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0) %>% ungroup()
-  # # alternative method with slice max done twice
-  # x <- x %>% group_by(Community) %>%
-  #   slice_max(order_by = !! sym(col_name)) %>%
-  #   slice_max(order_by = d) %>%
-  #   dplyr::mutate(sequen = 0) %>%
-  #   ungroup()
+  # we get max flow per group, and then get max distance on result in case of ties (so that we end up with 1 row per group)
+  x <- graph %>% group_by(Community) %>% 
+    slice_max(order_by = !! sym(col_name)) %>% 
+    slice_max(order_by = d) 
+  # assign sequence 0 to all edges that are in x
+  graph$sequen[graph$edge_id %in% x$edge_id] <- 0
+  # we keep track of the edges in the solution, so that we can identify the edges that neighbor them
+  chosen <- graph %>% filter(!(is.na(sequen)))
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
   # j counts km added. We don't count segments that already have cycling infrastructure
-  j <- sum(x$d) - sum(x$cycle_infra * x$d)
-
+  j <- sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
+  
   #while length of chosen segments is less than specified length 
   while (j/1000 < km){
-    # remove rows that have already been selected
-    remaining <- graph %>% filter(!(edge_id %in% x$edge_id))
+    # candidate list for selection: remove rows that have already been selected (i.e. sequen value is not NA)
+    remaining <- graph %>% filter(is.na(sequen))
     # identify road segments that neighbour existing selection
-    neighb_id <- graph$edge_id[which(graph$from_id %in% x$from_id | 
-                                       graph$from_id %in% x$to_id |
-                                       graph$to_id %in% x$from_id | 
-                                       graph$to_id %in% x$to_id)]
+    neighb_id <- graph$edge_id[which(graph$from_id %in% chosen$from_id | 
+                                       graph$from_id %in% chosen$to_id |
+                                       graph$to_id %in% chosen$from_id | 
+                                       graph$to_id %in% chosen$to_id)]
     # get neighbouring edges
     neighb <- remaining %>% filter(edge_id %in% neighb_id)
     # get id of best neighboring edge
     edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
-    # get nest neighboring edge as df row
-    edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-      mutate(sequen = i)
-    # append it to the solution
-    x <- rbind(x, edge_next)
-    
+    # assign a sequence to the selected edge
+    graph$sequen[graph$edge_id == edge_sel] <- i
+    # modify the 'chosen' sf so that it includes the new edge (new edge no longer has sequen == NA)
+    chosen <- graph %>% filter(!(is.na(sequen)))
+    # iterate
     i = i+1
     # Only count length of selected edges that have no cycling infrastructure.
-    # if condition is not met, j will not be changed in this iteration
-
-    j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+    j = sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
   }
-  return(x)
+  # keep only edges/rows that have been chosen
+  graph <- graph %>% filter(!(is.na(sequen)))
+  return(graph)
 }
-
 
 # test <- growth_community(graph_sf, 50, "flow")
 # # check km argument was respected 
@@ -280,45 +279,48 @@ growth_community <- function(graph, km, col_name) {
 #    far with a message showing the total edges returned (to compare with the input 'km' argument)
 
 ###############################################################
+
 growth_community_2 <- function(graph, km, col_name) {
   
   ### check if km chosen is a reasonable number (using a predefined function)
   check_km_value(graph, km)
   
-  # copy of graph to edit
-  x <- graph
-  # Group by community and get the edge with the highest flow in each group ( !! sym(col_name) used to point to col_name variable in function)
-  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
-  # above might return more than one edge per group (edges tied for highest flow), so here we group the 
-  # result by Community and select the longer edge
-  x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0) %>% ungroup()
+  # add sequence column
+  graph$sequen <- NA
+  # Group by community and get the edge with the highest flow in each group
+  # to pass column name in function (specific to dplyr): https://stackoverflow.com/questions/48062213/dplyr-using-column-names-as-function-arguments
+  # we get max flow per group, and then get max distance on result in case of ties (so that we end up with 1 row per group)
+  x <- graph %>% group_by(Community) %>% 
+    slice_max(order_by = !! sym(col_name)) %>% 
+    slice_max(order_by = d) 
+  # assign sequence 0 to all edges that are in x
+  graph$sequen[graph$edge_id %in% x$edge_id] <- 0
   ####################
   # split the graph into a list of dataframes with length = number of communities
   split <- graph %>%
     group_split(Community)
-  
   # check_conn is a vector of NAs with length = no. of communities. It is used to stop the function if 
   # there are no more connected edges in any of the communities. Otherwise it will go into an infinite loop.
   # We replace the a[i] with the community number if (nrow(neighb) = 0) for that community. If all NAs are replaced
   # we break out
   check_conn <- rep(NA, length(split))
   ####################
+  # we keep track of the edges in the solution, so that we can identify the edges that neighbor them
+  chosen <- graph %>% filter(!(is.na(sequen)))
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
   # j counts km added. We don't count segments that already have cycling infrastructure
-  j <- sum(x$d) - sum(x$cycle_infra * x$d)
+  j <- sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
   
   #while length of chosen segments is less than the specified length 
   while (j/1000 < km){
-    
     # for each community
     for (k in 1:length(split)){
       # edges in community k that have already been chosen 
-      chosen    <- split[[k]] %>% filter((edge_id %in% x$edge_id))
+      chosen    <- split[[k]] %>% filter(!(is.na(sequen)))
       # edges in community k that have not been chosen yet
-      remaining <- split[[k]] %>% filter(!(edge_id %in% x$edge_id))
-      
+      remaining <- split[[k]] %>% filter(is.na(sequen))
+      # if there are still edges in the community that haven't been chosen
       if (nrow(remaining) > 0){
         # all edges that neighbor the edges in the community that have already been chosen
         neighb_id <- split[[k]]$edge_id[which(split[[k]]$from_id %in% chosen$from_id | 
@@ -332,36 +334,37 @@ growth_community_2 <- function(graph, km, col_name) {
         # the edges in each community do not necessarily form one component. If this is the case, then neighb will 
         # return an empty sf feature, so an if function is added to only continue if neighb is not empty
         if (nrow(neighb) > 0){
-        #get the edge_id of the edge with the highest flow out of the neighb df
-        edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
-        # get nthe edge from it's edge id, and add a sequen column to show when it was added to the solution
-        edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-          mutate(sequen = i)
-        # append edge to the solution
-        x <- rbind(x, edge_next)
-        # Only count length of selected edges that have no cycling infrastructure.
-        j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+          #get the edge_id of the edge with the highest flow out of the neighb df
+          edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
+          # assign a sequence to the selected edge. Assign it to the graph sf and to the split sf
+          graph$sequen[graph$edge_id == edge_sel] <- i
+          # we need it here as well because this is where we filter nas for the 'chosen' variable
+          split[[k]]$sequen[split[[k]]$edge_id == edge_sel] <- i
+          
+          # Only count length of selected edges that have no cycling infrastructure. (edge length - (edge_length*cycling_infra binary value))
+          j = j + ((graph$d[graph$edge_id == edge_sel]) -  (graph$d[graph$edge_id == edge_sel] * graph$cycle_infra[graph$edge_id == edge_sel]))
         } else{
-          x <- x
-          j <- j
-          # add the community number to the check_conn vector
+          # if neighb is empty, add the community number to the check_conn vector
           check_conn[k] <- k
           # if check_conn vector becomes populated with all communities, break out of function
           if (!is.na(sum(check_conn))){
             message(paste0("There are no more connected edges to add for all communities. The returned object has ", round(j/1000),
-                         "km out of the specified ", km, "km"))
-            return(x)
+                           "km out of the specified ", km, "km"))
+            graph <- graph %>% filter(!(is.na(sequen)))
+            return(graph)
           }
         }
       } else{
-        x <- x
+        graph <- graph
         j <- j
       }
     }
     i <- i+1
   }
-  return(x)
+  graph <- graph %>% filter(!(is.na(sequen)))
+  return(graph)
 }
+
 
 
 # test <- growth_community_2(graph_sf, 500, "flow")
@@ -401,25 +404,28 @@ growth_community_3 <- function(graph, km, col_name) {
   ### check if km chosen is a reasonable number (using a predefined function)
   check_km_value(graph, km)
   
-  # copy of graph to edit
-  x <- graph
+  # add sequence column
+  graph$sequen <- NA
   # Group by community and get the edge with the highest flow in each group
-  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
-  # above might return more than one edge per group (edges tied for highest flow), so here we group the 
-  # result by Community and select the longer edge
-  x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0) %>% ungroup()
+  # to pass column name in function (specific to dplyr): https://stackoverflow.com/questions/48062213/dplyr-using-column-names-as-function-arguments
+  # we get max flow per group, and then get max distance on result in case of ties (so that we end up with 1 row per group)
+  x <- graph %>% group_by(Community) %>% 
+    slice_max(order_by = !! sym(col_name)) %>% 
+    slice_max(order_by = d) 
+  # assign sequence 0 to all edges that are in x
+  graph$sequen[graph$edge_id %in% x$edge_id] <- 0
   ####################
   # split the graph into a list of dataframes with length = number of communities
   split <- graph %>%
     group_split(Community)
   
-  
   ####################
+  # we keep track of the edges in the solution, so that we can identify the edges that neighbor them
+  chosen <- graph %>% filter(!(is.na(sequen)))
   # i keeps track of which iteration a chosen edge was added in
   i <- 1
   # j counts km added. We don't count segments that already have cycling infrastructure
-  j <- sum(x$d) - sum(x$cycle_infra * x$d)
+  j <- sum(chosen$d) - sum(chosen$cycle_infra * chosen$d)
   
   #while length of chosen segments is less than the specified length 
   while (j/1000 < km){
@@ -427,9 +433,9 @@ growth_community_3 <- function(graph, km, col_name) {
     # for each community
     for (k in 1:length(split)){
       # edges in community k that have already been chosen 
-      chosen    <- split[[k]] %>% filter((edge_id %in% x$edge_id))
+      chosen    <- split[[k]] %>% filter(!(is.na(sequen)))
       # edges in community k that have not been chosen yet
-      remaining <- split[[k]] %>% filter(!(edge_id %in% x$edge_id))
+      remaining <- split[[k]] %>% filter(is.na(sequen))
       
       if (nrow(remaining) > 0){
         # all edges that neighbor the edges in the community that have already been chosen
@@ -447,32 +453,32 @@ growth_community_3 <- function(graph, km, col_name) {
         if (nrow(neighb) > 0){
           #get the edge_id of the edge with the highest flow out of the neighb df
           edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
-          # get nthe edge from it's edge id, and add a sequen column to show when it was added to the solution
-          edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-            mutate(sequen = i)
-          # append edge to the solution
-          x <- rbind(x, edge_next)
+          # assign a sequence to the selected edge. Assign it to the graph sf and to the split sf
+          graph$sequen[graph$edge_id == edge_sel] <- i
+          # we need it here as well because this is where we filter nas for the 'chosen' variable
+          split[[k]]$sequen[split[[k]]$edge_id == edge_sel] <- i
           
-          j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+          # Only count length of selected edges that have no cycling infrastructure. (edge length - (edge_length*cycling_infra binary value))
+          j = j + ((graph$d[graph$edge_id == edge_sel]) -  (graph$d[graph$edge_id == edge_sel] * graph$cycle_infra[graph$edge_id == edge_sel]))
         } else{
           #get the edge_id of the edge with the highest flow out of the neighb df
           edge_sel <- remaining$edge_id[which.max(remaining[[col_name]])]
-          # get nthe edge from it's edge id, and add a sequen column to show when it was added to the solution
-          edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-            mutate(sequen = i)
-          # append edge to the solution
-          x <- rbind(x, edge_next)
-          # Only count length of selected edges that have no cycling infrastructure.
-          j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+          graph$sequen[graph$edge_id == edge_sel] <- i
+          # we need it here as well because this is where we filter nas for the 'chosen' variable
+          split[[k]]$sequen[split[[k]]$edge_id == edge_sel] <- i
+          
+          # Only count length of selected edges that have no cycling infrastructure. (edge length - (edge_length*cycling_infra binary value))
+          j = j + ((graph$d[graph$edge_id == edge_sel]) -  (graph$d[graph$edge_id == edge_sel] * graph$cycle_infra[graph$edge_id == edge_sel]))
         }
       } else{
-        x <- x
+        graph <- graph
         j <- j
       }
     }
     i <- i+1
   }
-  return(x)
+  graph <- graph %>% filter(!(is.na(sequen)))
+  return(graph)
 }
 
 # test <- growth_community_3(graph_sf, 50, "flow")
@@ -505,33 +511,35 @@ growth_community_3 <- function(graph, km, col_name) {
 # At each iteration we calculate the no of components that make up the current solution. We start with all cycling
 # infrastructure and then as edges are added, the number of components should go down
 
+
 growth_community_4 <- function(graph, km, col_name) {
   
   ### check if km chosen is a reasonable number. Function is defined in the beginning
   check_km_value(graph, km)
   
-  # copy of graph to edit
-  x <- graph
+  # add empty columns for sequence, number of compenents in solution, and size of largest connected component
+  graph <- graph %>% mutate(sequen= NA,
+                            no_components = NA,
+                            gcc_size = NA)
   # Group by community and get the edge with the highest flow in each group
-  x <- x %>% group_by(Community) %>% top_n(1, !! sym(col_name)) %>% ungroup()
-  # above might return more than one edge per group (edges tied for highest flow), so here we group the 
-  # result by Community and select the longer edge
-  x <- x %>% group_by(Community) %>% top_n(1, d) %>%
-    dplyr::mutate(sequen = 0) %>% ungroup()
+  # to pass column name in function (specific to dplyr): https://stackoverflow.com/questions/48062213/dplyr-using-column-names-as-function-arguments
+  # we get max flow per group, and then get max distance on result in case of ties (so that we end up with 1 row per group)
+  x <- graph %>% group_by(Community) %>% 
+    slice_max(order_by = !! sym(col_name)) %>% 
+    slice_max(order_by = d) %>% ungroup()
   # get all edges with cycling infrastructure
-  y <- graph %>% dplyr::filter(cycle_infra == 1) %>%
-    dplyr::mutate(sequen = 0)
-  # bind x and y
+  y <- graph %>% dplyr::filter(cycle_infra == 1) 
   x <- rbind(x, y)
   # remove duplicates
   x <- dplyr::distinct(x, edge_id, .keep_all = TRUE) 
+  # assign sequence 0 to all edges that are in x
+  graph$sequen[graph$edge_id %in% x$edge_id] <- 0
   # we need a network representation to get no. of components and size of gcc using igraph
-  net <- as_sfnetwork(x)
-  # calculate no of components in the solution
-  x <- x %>%  mutate(no_components = igraph::count_components(net),
-                     # to get size largest connected component 
-                     gcc_size = components(net)$csize[which.max(components(net)$csize)])
-  
+  net <- graph  %>% filter(!(is.na(sequen))) %>% as_sfnetwork()
+  # calculate no of components and size of largest connected component (for current solution)
+  # only add the values to the rows in the graph that are also in x
+  graph$no_components[graph$edge_id %in% x$edge_id] <- igraph::count_components(net)
+  graph$gcc_size[graph$edge_id %in% x$edge_id] <- components(net)$csize[which.max(components(net)$csize)]
   # split the graph into a list of dataframes with length = number of communities
   split <- graph %>%
     group_split(Community)
@@ -541,17 +549,18 @@ growth_community_4 <- function(graph, km, col_name) {
   # j counts km added. We don't count segments that already have cycling infrastructure
   j <- sum(x$d) - sum(x$cycle_infra * x$d)
   
+  
   #while length of chosen segments is less than the specified length 
   while (j/1000 < km){
     
     # for each community
     for (k in 1:length(split)){
       # edges in community k that have already been chosen 
-      chosen    <- split[[k]] %>% filter((edge_id %in% x$edge_id))
+      chosen    <- split[[k]] %>% filter(!(is.na(sequen)))
       # edges in community k that have not been chosen yet
-      remaining <- split[[k]] %>% filter(!(edge_id %in% x$edge_id))
+      remaining <- split[[k]] %>% filter(is.na(sequen))
       # we need a network representation to get no. of components and size of gcc using igraph
-      net <- as_sfnetwork(x)
+      net <- graph  %>% filter(!(is.na(sequen))) %>% as_sfnetwork()
       # if there are still edges in the community to be selected 
       if (nrow(remaining) > 0){
         # all edges that neighbor the edges in the community that have already been chosen
@@ -568,43 +577,42 @@ growth_community_4 <- function(graph, km, col_name) {
         if (nrow(neighb) > 0){
           #get the edge_id of the edge with the highest flow out of the neighb df
           edge_sel <- neighb$edge_id[which.max(neighb[[col_name]])]
-          # get nthe edge from it's edge id, and add a sequen column to show when it was added to the solution
-          edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-            mutate(sequen = i,
-                   # calculate no of components in the solution up to this point
-                   no_components = igraph::count_components(net),
-                   # to get size largest connected component 
-                   gcc_size = components(net)$csize[which.max(components(net)$csize)])
-          # append edge to the solution
-          x <- rbind(x, edge_next)
+          # assign a sequence to the selected edge
+          graph$sequen[graph$edge_id == edge_sel] <- i
+          # we need it here as well because this is where we filter nas for the 'chosen' variable
+          split[[k]]$sequen[split[[k]]$edge_id == edge_sel] <- i
+          # get no of components and size of largest connected component at this iteration
+          graph$no_components[graph$edge_id == edge_sel] <- igraph::count_components(net)
+          graph$gcc_size[graph$edge_id == edge_sel] <- components(net)$csize[which.max(components(net)$csize)]
           
-          j <- j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+          # Only count length of selected edges that have no cycling infrastructure. (edge length - (edge_length*cycling_infra binary value))
+          j = j + ((graph$d[graph$edge_id == edge_sel]) - (graph$d[graph$edge_id == edge_sel] * graph$cycle_infra[graph$edge_id == edge_sel]))
+          
         } else{
           #get the edge_id of the edge with the highest flow out of the remaining df
           edge_sel <- remaining$edge_id[which.max(remaining[[col_name]])]
-          # get the edge from it's edge id, and add a sequen column to show when it was added to the solution
-          edge_next <- graph %>% filter(edge_id == edge_sel) %>% 
-            mutate(sequen = i,
-                   # calculate no of components in the solution up to this point
-                   no_components = igraph::count_components(net),
-                   # to get size largest connected component 
-                   gcc_size = components(net)$csize[which.max(components(net)$csize)])
-          # append edge to the solution
-          x <- rbind(x, edge_next)
-          # Only count length of selected edges that have no cycling infrastructure.
-          j = j + (edge_next$d - (edge_next$d * edge_next$cycle_infra))
+          # assign a sequence to the selected edge
+          graph$sequen[graph$edge_id == edge_sel] <- i
+          # we need it here as well because this is where we filter nas for the 'chosen' variable
+          split[[k]]$sequen[split[[k]]$edge_id == edge_sel] <- i
+          # get no of components and size of largest connected component at this iteration
+          graph$no_components[graph$edge_id == edge_sel] <- igraph::count_components(net)
+          graph$gcc_size[graph$edge_id == edge_sel] <- components(net)$csize[which.max(components(net)$csize)]
+          
+          # Only count length of selected edges that have no cycling infrastructure. (edge length - (edge_length*cycling_infra binary value))
+          j = j + ((graph$d[graph$edge_id == edge_sel]) - (graph$d[graph$edge_id == edge_sel] * graph$cycle_infra[graph$edge_id == edge_sel]))
         }
       } else{
         # if there are no more edges in that community, do nothing
-        x <- x
+        graph <- graph
         j <- j
       }
     }
     i <- i+1
   }
-  return(x)
+  graph <- graph %>% filter(!(is.na(sequen)))
+  return(graph)
 }
-
 
 #debugging - START
 # graph_sf %>% st_drop_geometry %>% group_by(Community, cycle_infra) %>% summarize(length = sum(d)/ 1000)
@@ -635,5 +643,4 @@ rm(test, test_0, test2, graph_sf)
 
 ## adding igraph connected components function takes double the time 
 #system.time({ growth_community_4(graph_sf, 30, "flow") })
-
 

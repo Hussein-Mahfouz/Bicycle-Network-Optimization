@@ -6,13 +6,6 @@ library(rbenchmark)
 
 test <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_default_communities.RDS"))
 
-test <- test %>% mutate(sequen= NA)
-edge_sel <- test$edge_id[which.max(test$flow)]
-# replace sequen value with specific value
-test <- within(test, sequen[edge_id == edge_sel] <- 5)
-# same as above but this is cleaner
-test$sequen[test$edge_id == edge_sel] <- 2
-
 
 growth_one_seed_modified <- function(graph, km, col_name) {
   
@@ -59,10 +52,10 @@ growth_one_seed_modified <- function(graph, km, col_name) {
   return(graph)
 }
 
-old <- growth_one_seed(test, 30, "flow")
+old <- growth_one_seed_OLD(test, 30, "flow")
 new <- growth_one_seed_modified(test, 30, "flow")
 # it is faster
-system.time({growth_one_seed(test, 20, "flow")})
+system.time({growth_one_seed_OLD(test, 20, "flow")})
 system.time({growth_one_seed_modified(test, 20, "flow")})
 
 
@@ -123,10 +116,10 @@ growth_existing_infra_modified <- function(graph, km, col_name) {
   return(graph)
 }
 
-old <- growth_existing_infra(test, 10, "flow")
+old <- growth_existing_infra_OLD(test, 10, "flow")
 new <- growth_existing_infra_modified(test, 10, "flow")
 # it is faster
-system.time({growth_existing_infra(test, 100, "flow")})
+system.time({growth_existing_infra_OLD(test, 100, "flow")})
 system.time({growth_existing_infra_modified(test, 100, "flow")})
 
 
@@ -182,10 +175,10 @@ growth_community_modified <- function(graph, km, col_name) {
   return(graph)
 }
 
-old <- growth_community(test, 10, "flow")
+old <- growth_community_OLD(test, 10, "flow")
 new <- growth_community_modified(test, 10, "flow")
 # it is faster
-system.time({growth_community(test, 200, "flow")})
+system.time({growth_community_OLD(test, 200, "flow")})
 system.time({growth_community_modified(test, 200, "flow")})
 
 
@@ -288,10 +281,10 @@ growth_community_2_modified <- function(graph, km, col_name) {
 }
 
 
-old <- growth_community_2(test, 200, "flow")
+old <- growth_community_2_OLD(test, 200, "flow")
 new <- growth_community_2_modified(test, 200, "flow")
 
-system.time({growth_community_2(test, 300, "flow")})
+system.time({growth_community_2_OLD(test, 300, "flow")})
 system.time({growth_community_2_modified(test, 300, "flow")})
 
 
@@ -379,10 +372,10 @@ growth_community_3_modified <- function(graph, km, col_name) {
 }
 
 
-old <- growth_community_3(test, 10, "flow")
+old <- growth_community_3_OLD(test, 10, "flow")
 new <- growth_community_3_modified(test, 10, "flow")
 
-system.time({growth_community_3(test, 30, "flow")})
+system.time({growth_community_3_OLD(test, 30, "flow")})
 system.time({growth_community_3_modified(test, 30, "flow")})
 
 
@@ -490,11 +483,11 @@ growth_community_4_modified <- function(graph, km, col_name) {
 }
 
 
-old <- growth_community_4(test, 10, "flow")
-new <- growth_community_4_modified(test, 10, "flow")
+old <- growth_community_4_OLD(test, 50, "flow")
+new <- growth_community_4_modified(test, 50, "flow")
 
-system.time({growth_community_4(test, 100, "flow")})
-system.time({growth_community_4_modified(test, 100, "flow")})
+system.time({growth_community_4_OLD(test, 150, "flow")})
+system.time({growth_community_4_modified(test, 150, "flow")})
 
 
 

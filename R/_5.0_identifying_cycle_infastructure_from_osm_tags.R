@@ -1,7 +1,7 @@
 library(sf)
 library(dodgr)
 library(tidyverse)
-
+library(tmap)
 # IDENTIFY ALL ROAD SEGMENTS WITH DEDICATED CYCLING INFRASTRUCTURE
 
 ########
@@ -103,6 +103,69 @@ plot(st_geometry(graph_sf), col='lightgrey')
 plot(st_geometry(cycle_designated), add=TRUE, col='darkred')
 plot(st_geometry(cycleways), add=TRUE, col='green')
 
+# TMAPS to show tag inconsistencies
+
+# bicycle = designated
+tm_shape(graph_sf) +
+  tm_lines(col = 'gray90') +
+  tm_shape(cycle_designated) +
+  tm_lines(title.col = "Priority (km)",
+           col = 'darkgreen',
+           lwd = 1.5) +
+  tm_layout(title = "OSM tag: \nbicycle = designated",        
+            title.size = 1.2,
+            title.color = "azure4",
+            title.position = c("left", "top"),
+            inner.margins = c(0.1, 0.1, 0.1, 0.1),    # bottom, left, top, and right margin
+            fontfamily = 'Georgia',
+            legend.position = c("right", "bottom"),
+            frame = FALSE) -> p1
+
+# highway = cycleway
+tm_shape(graph_sf) +
+  tm_lines(col = 'gray90') +
+  tm_shape(cycleways) +
+  tm_lines(title.col = "Priority (km)",
+           col = 'darkgreen',
+           lwd = 1.5) +
+  tm_layout(title = "OSM tag: \nhighway = cycleway",        
+            title.size = 1.2,
+            title.color = "azure4",
+            title.position = c("left", "top"),
+            inner.margins = c(0.1, 0.1, 0.1, 0.1),    # bottom, left, top, and right margin
+            fontfamily = 'Georgia',
+            legend.position = c("right", "bottom"),
+            frame = FALSE) -> p2
+
+# bicycle = designated & highway != cycleway
+tm_shape(graph_sf) +
+  tm_lines(col = 'gray90') +
+  tm_shape(cycle_designated) +
+  tm_lines(title.col = "Priority (km)",
+           col = 'firebrick2',
+           lwd = 1.4) +
+  tm_shape(cycleways) +
+  tm_lines(title.col = "Priority (km)",
+           col = 'gray90',
+           lwd = 1.8) +
+  tm_layout(title = "bicycle = designated & \nhighway != cycleway",        
+            title.size = 1.2,
+            title.color = "azure4",
+            title.position = c("left", "top"),
+            inner.margins = c(0.1, 0.1, 0.1, 0.1),    # bottom, left, top, and right margin
+            fontfamily = 'Georgia',
+            legend.position = c("right", "bottom"),
+            frame = FALSE) ->  p3
+
+
+p <- tmap_arrange(p1, p2, p3, nrow = 1)
+
+
+tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/OSM_identifying_cycle_infrastructure.png"),
+          width=10, height=5)
+
+
+
 # create a combined geometry with all edges matching either of the two conditions
 # highway == 'cycleway' | bicycle == 'designated'. Since we know that that neigher of them
 # completely contains the other
@@ -190,6 +253,6 @@ saveRDS(graph_sf_trunk, file = paste0("../data/", chosen_city, "/graph_with_flow
 rm(bicycle, cycle_designated, cycleway, cycleways, graph_sf, 
    graph_sf_cycle, graph_sf_trunk, graph_sf_unweight, 
    highway, lanes, maxspeed, msoa_centroids, pts, segregated,
-   sel_sgbp, streetnet, streetnet2, sel_logical)
+   sel_sgbp, streetnet, streetnet2, sel_logical, p, p1, p2, p3)
 
 

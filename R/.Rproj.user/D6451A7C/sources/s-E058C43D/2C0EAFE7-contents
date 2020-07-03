@@ -59,11 +59,24 @@ graph_trunk <- weight_streetnet(streetnet_sc,
                                 wt_profile_file = "../data/weight_profile_trunk.json")
 
 
-# # add flows to road segments
+# # add flows to road segments # norm_sums isn't a parameter apparently. Tried updating dodgr...
 # graph_flows <- dodgr_flows_aggregate(
 #                   graph = graph_default,
 #                   from = from, to = to, flows = od_flow_matrix,
-#                   contract = TRUE, quiet = FALSE)
+#                   norm_sums = TRUE,
+#                   contract = TRUE, 
+#                   quiet = FALSE)
+# 
+# graph_flows2 <- dodgr_flows_aggregate(
+#   graph = graph_default,
+#   from = from, 
+#   to = to, 
+#   flows = od_flow_matrix,
+#   norm_sums = FALSE)
+#   contract = TRUE, quiet = FALSE)
+
+
+
 # 
 # # Turn into undirected graph 
 # graph_undir <- dodgr::merge_directed_flows(graph_flows)
@@ -104,10 +117,6 @@ saveRDS(graph_sf_unweight, file = paste0("../data/", chosen_city, "/graph_with_f
 saveRDS(graph_sf_trunk, file = paste0("../data/", chosen_city, "/graph_with_flows_trunk.Rds"))
 
 
-# Plot the different results to compare. DO IT HERE NOT AFTER. IT DOESN't MATTER THAT CYCLEWAYS 
-# AREN'T COMPREHENSIVE IN DETERMINE BICYCLE INFRASTRUCTURE. WE ARE LOOKING AT THE EFFECTS OF WEIGHTS
-# ON ROUTING
-# See % of flow on cycleways, trunk ets
 
 
 rm(from, graph_default, graph_sf_default, graph_sf_trunk, graph_sf_unweight,
