@@ -30,7 +30,7 @@ graph_sf <- graph_sf %>%
 ### TO A SPECIFIC COMMUNITY. WE DO NOT CONTROL FOR THE NUMBER OF EDGES ADDED FROM EACH COMMUNITY. ###
 ########################################################################################################### 
 
-growth_community_seeds <- growth_community(graph = graph_sf, km = 500, col_name = "flow")
+growth_community_seeds <- growth_community(graph = graph_sf, km = 135, col_name = "flow")
 
 
 # prepare a dataframe for plotting the results
@@ -174,7 +174,7 @@ tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Resul
 ###########################################################################################################  
 
 # let's grow the network based on the flow column
-grow_flow <- growth_community_2(graph = graph_sf, km = 500, col_name = "flow")
+grow_flow <- growth_community_2(graph = graph_sf, km = 135, col_name = "flow")
 
 # prepare a dataframe for plotting the results
 grow_flow_c <- grow_flow %>% 
@@ -253,7 +253,7 @@ ggplot(data=p , aes(x=highway, y=dist, fill = distance_groups)) +
 ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_community_2_investment_highways_flow.png"))
 
 # grow the network based on the person_km column. 
-grow_person_km <- growth_community_2(graph = graph_sf, km = 500, col_name = "person_km")
+grow_person_km <- growth_community_2(graph = graph_sf, km = 135, col_name = "person_km")
 
 # prepare a dataframe for ggplot
 grow_person_km_c <- grow_person_km %>% 
@@ -448,7 +448,7 @@ tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Resul
                               #########################################
 
 # let's grow the network based on the flow column
-grow_flow_infra <- growth_community_4(graph = graph_sf, km = 500, col_name = "flow")
+grow_flow_infra <- growth_community_4(graph = graph_sf, km = 135, col_name = "flow")
 # get % of edges in gcc
 grow_flow_infra$gcc_size_perc <- (grow_flow_infra$gcc_size / nrow(graph_sf)) * 100
 # prepare a dataframe for ggplot

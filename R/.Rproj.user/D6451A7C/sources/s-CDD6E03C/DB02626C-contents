@@ -1,8 +1,10 @@
+##### IDENTIFY ALL ROAD SEGMENTS WITH DEDICATED CYCLING INFRASTRUCTURE #####
+############################################################################
+
 library(sf)
 library(dodgr)
 library(tidyverse)
 library(tmap)
-# IDENTIFY ALL ROAD SEGMENTS WITH DEDICATED CYCLING INFRASTRUCTURE
 
 ########
 # Get road network through dodgr

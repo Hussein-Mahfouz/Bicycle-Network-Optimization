@@ -30,7 +30,7 @@ graph_sf <- graph_sf %>%
 ########################################### FUNCTION 1: GROWTH FROM ONE SEED/EDGE ###########################################
 
 # let's grow the network based on the flow column
-grow_flow_1_seed <- growth_one_seed(graph = graph_sf, km = 500, col_name = "flow")
+grow_flow_1_seed <- growth_one_seed(graph = graph_sf, km = 135, col_name = "flow")
 
 # prepare a dataframe for plotting the results
 grow_flow_1_seed_c <- grow_flow_1_seed %>% 
@@ -113,7 +113,7 @@ tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Resul
 
 
 # let's grow the network based on existing infrastructure
-grow_flow_existing_infra <- growth_existing_infra(graph = graph_sf, km = 500, col_name = "flow")
+grow_flow_existing_infra <- growth_existing_infra(graph = graph_sf, km = 135, col_name = "flow")
 
 
 # get % of edges in gcc

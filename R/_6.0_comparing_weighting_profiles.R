@@ -115,7 +115,7 @@ tm_shape(x) +
             title.position = c("left", "top"),
             inner.margins = c(0.1, 0.25, 0.1, 0.1),    # bottom, left, top, and right margin
             fontfamily = 'Georgia',
-            legend.position = c("right", "bottom"),
+            #legend.position = c("right", "bottom"),
             frame = FALSE) -> p
 
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/osm_road_types_all.png"))
@@ -141,7 +141,7 @@ tm_shape(x) +
             title.position = c("left", "top"),
             inner.margins = c(0.1, 0.25, 0.1, 0.1),    # bottom, left, top, and right margin
             fontfamily = 'Georgia',
-            legend.position = c("right", "bottom"),
+            #legend.position = c("right", "bottom"),
             frame = FALSE) -> p
 
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/osm_road_types_routed.png"))
