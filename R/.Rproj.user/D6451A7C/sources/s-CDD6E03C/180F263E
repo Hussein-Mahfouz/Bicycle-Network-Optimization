@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592992073139.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3101830059",
+    "id" : "180F263E",
+    "lastKnownWriteTime" : 1594034766,
+    "last_content_update" : 1594034766153,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/_8.0_growing_a_network.R",
+    "project_path" : "_8.0_growing_a_network.R",
+    "properties" : {
+        "cursorPosition" : "571,31",
+        "scrollLine" : "585",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

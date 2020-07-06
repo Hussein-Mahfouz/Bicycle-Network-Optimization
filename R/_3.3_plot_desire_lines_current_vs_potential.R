@@ -127,6 +127,7 @@ tm_shape(desire_cycling_long) +
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/desire_facet_cycling.png"), 
           width=8, height=6)
 
-
-
+# clear environment
+rm(city_centroids, city_geom, city_msoas, city_od, city_potential_cycling, desire_cycling_long, 
+   desire_lines, desire_lines_all, desire_lines_cycling, flow_threshold_all, flow_threshold_cycling, p)
 

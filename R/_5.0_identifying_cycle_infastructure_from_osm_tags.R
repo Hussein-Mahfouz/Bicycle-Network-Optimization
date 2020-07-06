@@ -253,6 +253,6 @@ saveRDS(graph_sf_trunk, file = paste0("../data/", chosen_city, "/graph_with_flow
 rm(bicycle, cycle_designated, cycleway, cycleways, graph_sf, 
    graph_sf_cycle, graph_sf_trunk, graph_sf_unweight, 
    highway, lanes, maxspeed, msoa_centroids, pts, segregated,
-   sel_sgbp, streetnet, streetnet2, sel_logical, p, p1, p2, p3)
+   sel_sgbp, streetnet, streetnet2, sel_logical, p, p1, p2, p3, infra_exists)
 
 
