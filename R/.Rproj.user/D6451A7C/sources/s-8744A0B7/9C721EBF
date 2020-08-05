@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592584343132.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9C721EBF",
+    "lastKnownWriteTime" : 1596031753,
+    "last_content_update" : 1596031753929,
+    "path" : "~/Documents/Code Repos/Bicycle-Network-Optimization/R/_7.0_community_detection.R",
+    "project_path" : "_7.0_community_detection.R",
+    "properties" : {
+        "cursorPosition" : "217,34",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
