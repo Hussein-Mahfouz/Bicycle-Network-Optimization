@@ -112,7 +112,8 @@ tm_shape(graph_sf) +
             inner.margins = c(0.1, 0.1, 0.1, 0.1),    # bottom, left, top, and right margin
             fontfamily = 'Georgia',
             #legend.position = c("right", "bottom"),
-            frame = FALSE) -> p
+            frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60")-> p
 
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_community_FLOW.png"))
 
@@ -262,6 +263,10 @@ ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_community_2_
 
 # grow the network based on the person_km column. 
 grow_person_km <- growth_community_2(graph = graph_sf, km = no_cycle_infra, col_name = "person_km")
+# save
+saveRDS(grow_person_km, file = paste0("../data/", chosen_city, "/growth_fun_4_pers_km.Rds"))
+# read in 
+#grow_flow <- readRDS(paste0("../data/", chosen_city,"/growth_fun_4_pers_km.Rds"))
 
 # prepare a dataframe for ggplot
 grow_person_km_c <- grow_person_km %>% 
@@ -362,7 +367,8 @@ tm_shape(graph_sf) +
             inner.margins = c(0.1, 0.1, 0.1, 0.1),    # bottom, left, top, and right margin
             fontfamily = 'Georgia',
             #legend.position = c("right", "bottom"),
-            frame = FALSE) -> p
+            frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") -> p
 
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_community_2_FLOW.png"))
 
@@ -623,6 +629,7 @@ tm_shape(grow_flow_infra_c) +
             fontfamily = 'Georgia',
             #legend.position = c("right", "bottom"),
             frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") +
   # add legend for the existing cycling infrastructure
   tm_add_legend(type = "line", labels = 'Existing Cycling Infrastructure', col = 'firebrick2', lwd = 2) -> p
 

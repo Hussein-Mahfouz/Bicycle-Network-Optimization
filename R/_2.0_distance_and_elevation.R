@@ -263,24 +263,43 @@ dist_mat_all <- dist_mat_1 %>% left_join(dist_mat_2, by = c("from" = "from", "to
 
 ##### CIRCUITRY
 # weighted / unweighted
-dist_mat_all$circuitry_1_2 <- dist_mat_all$dist_2 / dist_mat_all$dist_1
+dist_mat_all$circuity_1_2 <- dist_mat_all$dist_2 / dist_mat_all$dist_1
 # weighted_no_main_roads / unweighted
-dist_mat_all$circuitry_1_3 <- dist_mat_all$dist_3 / dist_mat_all$dist_1
+dist_mat_all$circuity_1_3 <- dist_mat_all$dist_3 / dist_mat_all$dist_1
 # weighted_no_main_roads / weighted
-dist_mat_all$circuitry_2_3 <- dist_mat_all$dist_3 / dist_mat_all$dist_2
+dist_mat_all$circuity_2_3 <- dist_mat_all$dist_3 / dist_mat_all$dist_2
 
 # histogram
-dist_mat_all %>% filter(circuitry_1_3 >= 1) %>%
-ggplot(aes(x = circuitry_1_3)) + 
+dist_mat_all %>% filter(circuity_1_3 >= 1) %>%
+ggplot(aes(x = circuity_1_3)) + 
   geom_histogram(color = "black", alpha = 0.5) 
 
+ # COMPARE ONLY 1_2 with 1_3 to make the point 
 # boxplot
-dist_mat_all %>% 
-  select(circuitry_1_2, circuitry_1_3, circuitry_2_3) %>%
-  filter(circuitry_1_2 >= 1 & circuitry_1_3 >= 1 & circuitry_2_3 >= 1) %>%
-  pivot_longer(everything(), names_to = "circuitry", values_to = "value") %>%  # everything() so that you pivot all columns
-  ggplot(aes(value, circuitry)) + 
-  geom_boxplot(outlier.colour = "red")
+dist_mat_all_box <- dist_mat_all %>%
+  select(circuity_1_2, circuity_1_3) %>%
+  filter(circuity_1_2 >= 1 & circuity_1_3 >= 1) %>%
+  pivot_longer(everything(), names_to = "circuity", values_to = "value")  # everything() so that you pivot all columns
+
+dist_mat_all_box %>% 
+  filter(value <= 3) %>%   # because there are a few very large values that ruin the scale of the plot
+ggplot(aes(value, circuity)) + 
+  geom_boxplot(outlier.alpha = 0.5) +
+  scale_x_continuous(name = 'Distance Relative to Unweighted Shortest Path (Ratio)', 
+                     breaks = seq(1, 3, by = 0.2)) +  # seq(1, max(dist_mat_all_box$value, , by = 0.2)
+  scale_y_discrete(name = '', labels=c("Weighted", "Weighted \n(No Trunk \n or Primary)")) +
+  #xlim(NA, 3) +
+  #ggtitle("Comparing Weighted to Unweighted Shortest Paths") +
+  theme_minimal()
+
+ggsave(paste0("../data/", chosen_city,"/Plots/boxplot_weighted_unweighted_distances.png"))
+
+# point graph distance vs circuity
+dist_mat_all %>% filter(circuity_1_2 >= 1) %>%
+  ggplot(aes(x = dist_1, y = circuity_1_2)) + 
+  geom_point(color = "darkred", alpha = 0.3) +
+  geom_smooth(color = "black", alpha = 0.5) 
+
 
 ##### COMPARE WEIGHTING PROFILES - END
 
@@ -318,7 +337,8 @@ dist_mat_all %>%
 # write_csv(distances, path = paste0("../data/",chosen_city, dist_straight_vs_dodgr.csv"))
 
 # remove variables from global environment
-rm(city_geom, city_names, dist_mat, flows_city, flows_slope, graph, graph_contracted,
+rm(city_geom, city_names, dist_mat, dist_mat_1, dist_mat_2, dist_mat_3, dist_mat_all, dist_mat_all_box, 
+   flows_city, flows_slope, graph, graph_contracted, graph_1, graph_2, graph_3,
    msoa_centroids, msoa_centroids_snapped, msoa_lon_lat, msoas_city,
    net, pts, streetnet_sc, uk_elev)
 

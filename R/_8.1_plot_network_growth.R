@@ -8,7 +8,6 @@ library(tmap)
 #create a directory to store data related to this city (does nothing if directory already exists)
 dir.create(paste0("../data/", chosen_city, "/Plots/Growth_Results"), showWarnings = FALSE)
 
-
 graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_weighted_communities.RDS"))
 
 # we weigh the flow on each edge by its distance. We can then get how much of the commuter km are satisfied
@@ -119,7 +118,8 @@ tm_shape(graph_sf) +
             inner.margins = c(0.1, 0.1, 0.1, 0.1),    # bottom, left, top, and right margin
             fontfamily = 'Georgia',
             #legend.position = c("right", "bottom"),
-            frame = FALSE) -> p
+            frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") -> p
 
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_one_seed_priority_all_FLOW.png"))
 
@@ -280,6 +280,7 @@ tm_shape(graph_sf) +
             fontfamily = 'Georgia',
             #legend.position = c("left", "bottom"),
             frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") +
   # add legend for the existing cycling infrastructure
   tm_add_legend(type = "line", labels = 'Existing Cycling Infrastructure', col = 'firebrick2', lwd = 2) -> p
 

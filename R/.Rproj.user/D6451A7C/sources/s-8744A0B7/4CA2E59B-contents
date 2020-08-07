@@ -309,7 +309,8 @@ tm_shape(facet_2) +
             #legend.title.size=0.85,
             legend.show = FALSE,
             #legend.position = c("right", "bottom"),
-            frame = FALSE)  -> p2
+            frame = FALSE)  +
+   tm_scale_bar(color.dark = "gray60") -> p2
 
 # plot3 <- graph_sf_trunk %>% 
 #   dplyr::filter(highway == road_type)

@@ -188,7 +188,8 @@ tm_shape(graph_sf) +
             inner.margins = c(0.1, 0.1, 0.1, 0.1),    # bottom, left, top, and right margin
             fontfamily = 'Georgia',
             legend.position = c("right", "bottom"),
-            frame = FALSE) ->  p4
+            frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") ->  p4
 
 
 p <- tmap_arrange(p1, p2, p4, nrow = 1)

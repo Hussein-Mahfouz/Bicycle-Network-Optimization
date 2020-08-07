@@ -121,7 +121,8 @@ tm_shape(desire_cycling_long) +
             panel.label.bg.color = NA,   # remove facet title background
             legend.outside = TRUE,
             legend.outside.position = 'bottom',
-            frame = FALSE) -> p
+            frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") -> p
 
 #save
 tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/desire_facet_cycling.png"), 

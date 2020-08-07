@@ -154,7 +154,8 @@ tm_shape(road_segments) +
           palette = "Dark2") +
   tm_layout(fontfamily = 'Georgia',
             legend.show =FALSE,
-            frame = FALSE) -> tm2
+            frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") -> tm2
 
 # 3.3  get legend only for facet map
 tm_shape(road_segments) +
@@ -200,7 +201,8 @@ tm_shape(msoa_borders) +
   tm_fill(col = "Community",
           palette = "Dark2") +
   tm_layout(fontfamily = 'Georgia',
-            frame = FALSE) -> tm_single
+            frame = FALSE) +
+  tm_scale_bar(color.dark = "gray60") -> tm_single
 
 tmap_save(tm = tm_single, filename = paste0("../data/", chosen_city,"/Plots/communities_msoas", chosen_city, ".png"))
 
