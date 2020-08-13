@@ -136,30 +136,49 @@ uptake_decay$dist2 <- uptake_decay$dist / 1000
 # group data by distance. Change 'by' to edit number of groups
 uptake_decay$distance_groups <- cut(uptake_decay$dist2, breaks = seq(from = 0, to = 50, by = 1))
 
+# edit the distance group column to replace (0,1] with 0-1km
+#  \\ used when replacing "(" to avoid error 
+# https://stackoverflow.com/questions/9449466/remove-parenthesis-from-a-character-string
+uptake_decay <- uptake_decay %>% 
+  mutate(distance_groups = gsub("\\(", "", distance_groups)) %>%
+  mutate(distance_groups = gsub("]", " km", distance_groups)) %>%
+  mutate(distance_groups = gsub(",", "-", distance_groups))
+  
+
+# Group them for better graph (Reduce number of lines from 10 to 5). Use embedded ifelse
+uptake_decay$distance_groups_comb <- ifelse(uptake_decay$distance_groups %in% c("0-1 km", "1-2 km"), "0-2 km",
+                                       ifelse(uptake_decay$distance_groups %in% c("2-3 km", "3-4 km"), "2-4 km",
+                                         ifelse(uptake_decay$distance_groups %in% c("4-5 km", "5-6 km"), "4-6 km",
+                                           ifelse(uptake_decay$distance_groups %in% c("6-7 km", "7-8 km"), "6-8 km",
+                                             ifelse(uptake_decay$distance_groups %in% c("8-9 km", "9-10 km"), "8-10 km",
+                                               uptake_decay$distance_groups)))))
+
+
 # Mode Share Increase VS Performance (Under/Over) - geom smooth
 uptake_decay %>% filter(!(is.na(distance_groups))) %>%
-  filter(distance_groups %in% c("(0,1]", "(1,2]", "(2,3]", "(3,4]", "(4,5]", "(5,6]",
-                                "(6,7]", "(7,8]", "(8,9]")) %>% 
+  filter(distance_groups %in% c("0-1 km", "1-2 km", "2-3 km", "3-4 km", "4-5 km", "5-6 km",
+                                "6-7 km", "7-8 km", "8-9 km", "9-10 km")) %>% 
   ggplot() + 
   geom_smooth(aes(x = performance, y = (cycle_added_weighted / `All categories: Method of travel to work`) * 100,
-                  color = distance_groups)) + 
+                  color = distance_groups_comb)) + 
   theme_minimal() +
-  scale_colour_brewer(palette = "Blues") +
+  #scale_colour_brewer(palette = "Set3") +
   labs(title = "", 
        x="Existing Cycling Mode Share As Fraction of Cycling Potential", y = "Cycling Mode Share Increase (%)", 
-       color = "Distance Between \nOD Pair (km)") 
+       color = "Distance Separating \nOD Pair") 
+
 
 ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_increase_vs_performance_smooth.png"))
 
 # Mode Share Increase VS Performance (Under/Over) - geom point
 uptake_decay %>% filter(!(is.na(distance_groups))) %>%
-  filter(distance_groups %in% c("(0,1]", "(1,2]", "(2,3]", "(3,4]", "(4,5]", "(5,6]",
-                                "(6,7]", "(7,8]", "(8,9]")) %>% 
+  filter(distance_groups %in% c("0-1 km", "1-2 km", "2-3 km", "3-4 km", "4-5 km", "5-6 km",
+                                "6-7 km", "7-8 km", "8-9 km", "9-10 km")) %>% 
   ggplot() + 
   geom_jitter(aes(x = performance, y = (cycle_added_weighted / `All categories: Method of travel to work`) * 100,
-                  color = distance_groups)) + 
+                  color = distance_groups_comb)) + 
   theme_minimal() +
-  scale_colour_brewer(palette = "Blues") +
+  #scale_colour_brewer(palette = "Blues") +
   labs(title = "", 
        x="Existing Cycling Mode Share As Fraction of Cycling Potential", y = "Cycling Mode Share Increase (%)", 
        color = "Distance Between \nOD Pair (km)") 

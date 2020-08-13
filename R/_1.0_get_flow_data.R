@@ -53,8 +53,8 @@ cycle_mode_share <- flows %>%
 cycle_mode_share %>% #filter(city_origin != 'London') %>%
   ggplot(aes(all, mode_share)) +
   geom_point(aes(alpha = mode_share), show.legend = FALSE) +
-  # some filtering labels for aesthetic purposes
-  geom_label_repel(aes(label = ifelse(mode_share>12 | all> (2.3*mean(all)), as.character(city_origin),'')), 
+  # some filtering labels for aesthetic purposes. Add some cities explicitly as they are in my case study
+  geom_label_repel(aes(label = ifelse(mode_share>12 | all> (2.3*mean(all)) | city_origin %in% c('Manchester', 'Nottingham', 'Birmingham') , as.character(city_origin),'')), 
                        size =2.5) +
   labs(x="Total Number of Commuters", y = "Cycling Mode Share (%)") +
   scale_x_continuous(trans='log10', labels = scales::comma) +

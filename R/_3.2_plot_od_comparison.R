@@ -38,7 +38,7 @@ uptake_no_intra %>% dplyr::filter(dist <= 10) %>%
 # change distance from m to km
 uptake_decay$dist <- uptake_decay$dist / 1000
 # group data by distance. Change 'by' to edit number of groups
-uptake_decay$distance_groups <- cut(uptake_decay$dist, breaks = seq(from = 0, to = 50, by = 1))
+#uptake_decay$distance_groups <- cut(uptake_decay$dist, breaks = seq(from = 0, to = 50, by = 1))
 
 uptake_decay_grouped <- uptake_decay %>%
   group_by(distance_group = as.character(distance_groups)) %>%
@@ -95,7 +95,8 @@ uptake_decay$ratio <- uptake_decay$perc_cycle /  (uptake_decay$group_perc_cycle 
 # remove 0 distance because they haven't been ssigned to groups
 uptake_gg <- uptake_decay %>% filter(dist<10, dist!=0)
 
-order <- c('(0,1]', '(1,2]', '(2,3]', '(3,4]', '(4,5]', '(5,6]', '(6,7]', '(7,8]', '(8,9]', '(9,10]')
+order <- c("0-1 km", "1-2 km", "2-3 km", "3-4 km", "4-5 km", "5-6 km",
+           "6-7 km", "7-8 km", "8-9 km", "9-10 km")
 ggplot(uptake_gg, aes(x = factor(distance_groups, level = order), y = ratio)) +
   geom_boxplot(outlier.size  = 0) +
   ylim(NA, 5) +
@@ -136,7 +137,7 @@ tm_shape(city_geom) +
              lwd = 1, 
              alpha = 0.5) +
   tm_shape(uptake_plot) +
-  tm_lines(title.col = "Ratio",
+  tm_lines(title.col = "Ratio: OD Pair Cycling Mode Share / \nGroup Average Cycling Mode Share",
            legend.lwd.show = FALSE,   # remove lineweight legend
            #lwd = "perc_cycle",
            lwd = 0.7,
@@ -154,8 +155,9 @@ tm_shape(city_geom) +
             free.coords=FALSE,
             showNA = FALSE) +
   tm_layout(fontfamily = 'Georgia',
-            main.title = 'Cycling Relative to OD Pairs in Same Distance Group', 
+            main.title = 'Comparison of Cycling Uptake Across the City', 
             main.title.color = 'grey50',
+            legend.title.size = 0.8,
             frame = FALSE) -> p
 
 #save
@@ -171,7 +173,7 @@ tm_shape(city_geom) +
              lwd = 1, 
              alpha = 0.5) +
   tm_shape(uptake_low) +
-  tm_lines(title.col = "Ratio",
+  tm_lines(title.col = "Ratio: OD Pair Cycling Mode Share / \nGroup Average Cycling Mode Share",
            legend.lwd.show = FALSE,   # remove lineweight legend
            lwd = 0.7,
            col = "ratio",
@@ -184,7 +186,7 @@ tm_shape(city_geom) +
             free.coords=FALSE,
             showNA = FALSE) +
   tm_layout(fontfamily = 'Georgia',
-            main.title = 'OD Pairs with Flows Below Average', 
+            main.title = 'OD Pairs with Cycling Mode Share Below Group Average', 
             main.title.color = 'grey50',
             frame = FALSE) -> p
 
@@ -201,7 +203,7 @@ tm_shape(city_geom) +
              lwd = 1, 
              alpha = 0.5) +
   tm_shape(uptake_high) +
-  tm_lines(title.col = "Ratio",
+  tm_lines(title.col = "Ratio: OD Pair Cycling Mode Share / Group Average Cycling Mode Share",
            legend.lwd.show = FALSE,   # remove lineweight legend
            lwd = 0.7,
            col = "ratio",
@@ -214,7 +216,7 @@ tm_shape(city_geom) +
             free.coords=FALSE,
             showNA = FALSE) +
   tm_layout(fontfamily = 'Georgia',
-            main.title = 'OD Pairs with Flows Above Average', 
+            main.title = 'OD Pairs with Cycling Mode Share Above Group Average', 
             main.title.color = 'grey50',
             frame = FALSE) -> p
 

@@ -98,8 +98,9 @@ flow_long_bike <- flow_plot %>% tidyr::uncount(Bicycle) %>%
 flow_long_bike$dist <- flow_long_bike$dist / 1000
 
 ggplot(flow_long_bike, aes(x = dist)) + 
-  geom_histogram(color = "black", alpha = 0.5, binwidth = 0.5) +
-  labs(title = "Trips Made By Bicycle", x="Commuting Distance (km)", y = "No. of trips")
+  geom_histogram(color = "black", alpha = 0.4, binwidth = 1) +
+  theme_minimal() +
+  labs(title = "Trips Made By Bicycle", x="Commuting Distance (km)", y = "No. of Commuters")
 
 ggsave(paste0("../data/", chosen_city,"/Plots/histogram_distance_cycling.png"))
 
@@ -173,8 +174,8 @@ ggplot(histogram, aes(x=dist)) +
   geom_histogram(data=flow_long_all, color = 'grey50', aes(fill = "All")) +
   geom_histogram(data= flow_long_bike, color = 'grey50', aes(fill = "Bicycle (Current)")) +
   scale_fill_manual(name = "Mode", values = cols) +
-  labs(title = "Cycling Trips Compared to All Trips", 
-       x="Commuting Distance (km)", y = "No. of trips", color = "Legend")
+  labs(title = "Current Cycling Trips Compared to All Trips", 
+       x="Commuting Distance (km)", y = "No. of Commuters", color = "Legend")
 
 ggsave(paste0("../data/", chosen_city,"/Plots/histogram_distance_all_vs_cycling.png"))
 
@@ -184,8 +185,8 @@ ggplot(histogram, aes(x=dist)) +
   geom_histogram(data=flow_long_all, color = 'grey50', aes(fill = "All")) +
   geom_histogram(data= flow_long_potential, color = 'grey50', aes(fill = "Bicycle (Potential)")) +
   scale_fill_manual(name = "Mode", values = cols) +
-  labs(title = "Cycling Trips Compared to All Trips", 
-       x="Commuting Distance (km)", y = "No. of trips", color = "Legend") 
+  labs(title = "Potential Cycling Trips Compared to All Trips", 
+       x="Commuting Distance (km)", y = "No. of Commuters", color = "Legend") 
 
 ggsave(paste0("../data/", chosen_city,"/Plots/histogram_distance_all_vs_cycling_potential.png"))
 
@@ -195,8 +196,8 @@ ggplot(histogram, aes(x=dist)) +
   geom_histogram(data=flow_long_potential, color = 'grey50', aes(fill = "Potential")) +
   geom_histogram(data= flow_long_bike, color = 'grey50', aes(fill = "Current")) +
   scale_fill_manual(name = "", values = cols) +
-  labs(title = "Cycling Trips", 
-       x="Commuting Distance (km)", y = "No. of trips", color = "Legend") 
+  labs(title = "Current vs Potential Cycling Trips", 
+       x="Commuting Distance (km)", y = "No. of Commuters", color = "Legend") 
 
 ggsave(paste0("../data/", chosen_city,"/Plots/histogram_distance_cycling_potential_vs_current.png"))
 
