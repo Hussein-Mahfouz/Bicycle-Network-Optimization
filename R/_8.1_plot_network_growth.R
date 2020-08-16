@@ -13,6 +13,12 @@ graph_sf <- readRDS(paste0("../data/", chosen_city, "/graph_with_flows_weighted_
 # we weigh the flow on each edge by its distance. We can then get how much of the commuter km are satisfied
 graph_sf$person_km <- graph_sf$flow * graph_sf$d
 
+# check how many person-km in each Community 
+graph_sf %>% 
+  st_drop_geometry %>% 
+  group_by(Community) %>% 
+  summarize(total_person_km = sum(person_km) / 1000) %>% 
+  mutate(perc_person_km = (total_person_km / sum(total_person_km) * 100)) 
 ########## GGPLOTS SHOWING FLOW/PERSON_KM SATISFIED AT THE NETWORK LEVEL AND AT THE COMMUNITY LEVEL #############
 
 # get percentage contibution of each edge to the network (distance, flow, person_km)
@@ -327,7 +333,7 @@ tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Resul
 # clear environment
 rm(graph_sf, grow_flow_1_seed, grow_flow_1_seed_c, grow_flow_existing_infra, 
    initial_perc_satisfied_all, initial_perc_satisfied_comm, initial_infra, 
-   grow_flow_existing_infra_c, grow_flow_existing_infra_c_100, p, cycle_infra)
+   grow_flow_existing_infra_c_100, p, cycle_infra)
 
 
 

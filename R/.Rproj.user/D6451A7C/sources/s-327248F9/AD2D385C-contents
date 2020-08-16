@@ -707,7 +707,51 @@ tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/Growth_Resul
           width=10, height=4)
 
 
+
+
+
+# Comparing Utilitarin Approach (Function 2 in Script 8.1) to Egalitarian Approach (Function 6))
+
+# add column with label to each one, so we can bind them and then do a ggplot by color
+grow_flow_existing_infra_c$Approach <- "Algorithm 2 (Utilitarian)"
+
+grow_flow_infra_c$Approach <- "Algorithm 3 (Egalitarian)"
+
+# add rows
+components_fun2_fun6 <- rbind(grow_flow_existing_infra_c, grow_flow_infra_c)
+
+# plot
+ggplot(data=components_fun2_fun6, 
+       aes(x=dist_c, y=no_components,  color = str_wrap(Approach, 15))) + #str_wrap to wrap legend text
+  geom_line() +
+  labs(x = "Length of Investment (km)", y = "No. of Components",
+       title = chosen_city,
+       #subtitle = chosen_city,
+       color = "") +
+  theme_minimal() +
+  scale_fill_discrete(labels = c("Algorithm 2 (Utilitarian)", "Algorithm 3 (Egalitarian)")) +
+  theme(plot.subtitle = element_markdown(size =12),
+        legend.key.height=unit(1, "cm")) # spacing out legend keys
+
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_components_number_comparison", chosen_city, ".png"))
+
+
+ggplot(data=components_fun2_fun6 , 
+       aes(x=dist_c, y=gcc_size_perc, color = str_wrap(Approach, 15))) +
+  geom_line() +
+  ggtitle(chosen_city) +
+  labs(x = "Length of Investment (km)", y = "% of Edges in LCC",
+       #subtitle= chosen_city,
+       color = "") +
+  theme_minimal() +
+  scale_fill_discrete(labels = c("Algorithm 2 (Utilitarian)", "Algorithm 3 (Egalitarian)")) +
+  theme(plot.subtitle = element_markdown(size = 12),
+        legend.key.height=unit(1, "cm")) # spacing out legend keys)
+
+ggsave(paste0("../data/", chosen_city,"/Plots/Growth_Results/growth_existing_infra_components_gcc_comparison", chosen_city, ".png"))
+
+
 # clear environment 
 rm(grow_flow, grow_flow_c, grow_flow_c_100, grow_flow_infra, grow_flow_infra_c, grow_flow_infra_c_100,
    grow_person_km, grow_person_km_c, growth_community_seeds, growth_community_seeds_c, growth_community_seeds_c_100,
-   initial_perc_satisfied_all, initial_perc_satisfied_comm, initial_infra)
+   initial_perc_satisfied_all, initial_perc_satisfied_comm, initial_infra, grow_flow_existing_infra_c)

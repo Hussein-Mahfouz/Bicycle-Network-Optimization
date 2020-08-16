@@ -165,10 +165,10 @@ uptake_decay %>% filter(!(is.na(distance_groups))) %>%
   #scale_colour_brewer(palette = "Set3") +
   labs(title = "", 
        x="Existing Cycling Mode Share As Fraction of Cycling Potential", y = "Cycling Mode Share Increase (%)", 
-       color = "Distance Separating \nOD Pair") 
+       color = "Distance \nSeparating \nOD Pair") 
 
 
-ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_increase_vs_performance_smooth.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_increase_vs_performance_smooth_" , chosen_city, ".png"))
 
 # Mode Share Increase VS Performance (Under/Over) - geom point
 uptake_decay %>% filter(!(is.na(distance_groups))) %>%
@@ -183,7 +183,7 @@ uptake_decay %>% filter(!(is.na(distance_groups))) %>%
        x="Existing Cycling Mode Share As Fraction of Cycling Potential", y = "Cycling Mode Share Increase (%)", 
        color = "Distance Between \nOD Pair (km)") 
 
-ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_increase_vs_performance_point.png"))
+ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_increase_vs_performance_point_",chosen_city, ".png"))
 
 
 #save csv for routing
