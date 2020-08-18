@@ -1,10 +1,10 @@
 Road Segment Prioritization for Bicycle Infrastructure
 ================
 Hussein Mahfouz
-6/16/2020
+18/8/2020
 
-This Repo has the code used for the dissertation of my MSc in [Smart
-Cities and Urban
+This repository contains the code used for the dissertation of my MSc in
+[Smart Cities and Urban
 Analytics](https://www.ucl.ac.uk/prospective-students/graduate/taught-degrees/smart-cities-urban-analytics-msc)
 at CASA UCL. Below is an explanation of the scripts used, and how the
 analysis can be reproduced.
@@ -102,7 +102,8 @@ chosen_city <- "Manchester"
 The script then filters all flow data where both the Origin MSOA **AND**
 the destination MSOA are in the chosen city
 
------
+If you wish to run the analysis on London, then make sure you have a
+computer that is up to the task. I didn’t :(
 
 #### \_\_*2.0\_distance\_and\_elevation.R*
 
@@ -120,25 +121,23 @@ come from. Let’s say that the target for Manchester is a 10% increase in
 cyling mode share, how many additional cyclists do we assign to each OD
 pair to reach that target mode share
 
-  - Predict Probability of Cycling Between Each OD Pair Based On
+1.  Predict Probability of Cycling Between Each OD Pair Based On
     Geography
-
-  - A glm is used to predict probability of cycling based on distance
-    and slope
-
-  - Accounting for Existing Mode Share
-
-  - Look at performance of each OD pair and assign additional cyclists
-    accordingly. OD pairs that have a low cycling mode share are
-    allocated more cyclists than OD pairs that already have a high
-    cycling mode share. This is because OD pairs with low cycling mode
-    share have more potential (latent demand) than OD pairs with high
-    cycling mode share
-
-  - Scaling Results To Match Mode Share Target
-
-  - Scale potential cycling demand up or down so that it matches the
-    target of 10%
+    1.  A glm is used to predict probability of cycling based on
+        distance and slope
+2.  Accounting for Existing Mode Share
+    1.  Look at performance of each OD pair and assign additional
+        cyclists accordingly. OD pairs that have a low cycling mode
+        share are allocated more cyclists than OD pairs that already
+        have a high cycling mode share. This is because OD pairs with
+        low cycling mode share have more potential (latent demand) than
+        OD pairs with high cycling mode share
+3.  Scaling Results To Match Mode Share Target
+    1.  Specify target mode share increase (default is 10% but this is
+        unreasonable for a city like Cambridge that already has a
+        cycling mode share of 40%)
+    2.  Scale potential cycling demand up or down so that it matches the
+        target %
 increase
 
 #### \_\_*3.1\_plot\_mode\_shares.R* , \_\_3.2\_plot\_od\_comparison.R\_ , \_\_3.3\_plot\_desire\_lines\_current\_vs\_potential.R\_
@@ -157,10 +156,11 @@ share:
 
 </p>
 
-  - Vizualize Existing and Potential Cycling FLow as Desire Lines
+  - Vizualize Existing and Potential Cycling Flow as Desire Lines
 
-![desire lines](./data/Manchester/Plots/desire_facet_cycling.png) \*
-Examine where potential cycling demand is assigned.
+![desire lines](./data/Manchester/Plots/desire_facet_cycling.png)
+
+  - Examine where potential cycling demand is assigned.
 
 The methodology in \_\_*3.0\_potential\_demand.R* insures that OD pairs
 that have a low cycling mode share are allocated more cyclists than OD
