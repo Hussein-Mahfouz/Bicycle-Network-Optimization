@@ -3,29 +3,37 @@ Road Segment Prioritization for Bicycle Infrastructure
 Hussein Mahfouz
 6/16/2020
 
-This Repo has the code used for the dissertation of my MSc in Smart
-Cities and Urban Analytics at CASA UCL. Below is an explanation of the
-scripts used, and how the analysis can be reproduced.
+This Repo has the code used for the dissertation of my MSc in [Smart
+Cities and Urban
+Analytics](https://www.ucl.ac.uk/prospective-students/graduate/taught-degrees/smart-cities-urban-analytics-msc)
+at CASA UCL. Below is an explanation of the scripts used, and how the
+analysis can be reproduced.
 
 ## Paper
 
 The paper can be found in the repo, or through this
-[link](http://geoportal.statistics.gov.uk/datasets/78ff27e752e44c3194617017f3f15929)
-\#\# Missing Data
+[link](https://github.com/Hussein-Mahfouz/Bicycle-Network-Optimization/blob/master/Paper/CASA_Dissertation_16_August.pdf)
+
+-----
+
+## Missing Data
 
 There are a couple of files that cannot be synced to github due to their
 size. These files are neseccary for the scripts to run. Below are links
 to where you can download them, and instructions on where to place them
 in the repo file structure
 
-Flow Data (2011 Census Origin-Destination Data): - Source:
-<https://www.nomisweb.co.uk/census/2011/bulk/rOD1> Choose File “WU03EW”
-- Location in Repo: data-raw/flow\_data.csv
+Flow Data (2011 Census Origin-Destination Data):
 
-Middle Layer Super Output Areas (December 2011) Boundaries EW BFC:  
-\- Source:
-<http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_0>
-- Location in Repo: data-raw/MSOA\_2011\_Boundaries/\[Add files here\]
+  - Source: <https://www.nomisweb.co.uk/census/2011/bulk/rOD1> Choose
+    File **“WU03EW”**
+  - Location in Repo: data-raw/flow\_data.csv
+
+Middle Layer Super Output Areas (December 2011) Boundaries:
+
+  - Source:
+    <http://geoportal.statistics.gov.uk/datasets/826dc85fb600440889480f4d9dbb1a24_0>
+  - Location in Repo: data-raw/MSOA\_2011\_Boundaries/\[Add files here\]
 
 -----
 
@@ -85,7 +93,7 @@ this list of available
     ## [109] "Redditch"             "Worcester"            "Swansea"             
     ## [112] "Cardiff"              "Newport"
 
-This is done in line 17, for example:
+This is done in line 17. For example:
 
 ``` r
 chosen_city <- "Manchester"
@@ -93,6 +101,8 @@ chosen_city <- "Manchester"
 
 The script then filters all flow data where both the Origin MSOA **AND**
 the destination MSOA are in the chosen city
+
+-----
 
 #### \_\_*2.0\_distance\_and\_elevation.R*
 
@@ -149,9 +159,8 @@ share:
 
   - Vizualize Existing and Potential Cycling FLow as Desire Lines
 
-![desire lines](./data/Manchester/Plots/desire_facet_cycling.png)
-
-  - Examine where potential cycling demand is assigned.
+![desire lines](./data/Manchester/Plots/desire_facet_cycling.png) \*
+Examine where potential cycling demand is assigned.
 
 The methodology in \_\_*3.0\_potential\_demand.R* insures that OD pairs
 that have a low cycling mode share are allocated more cyclists than OD
@@ -168,7 +177,7 @@ shares.
 
 <p float="center">
 
-<img src="./data/Manchester/Plots/mode_share_increase_vs_performance_smooth.png" width="350" />
+<img src="./data/Manchester/Plots/mode_share_increase_vs_performance_smooth.png" width="400" />
 
 </p>
 
@@ -252,7 +261,7 @@ Birmingham on a 2.7 GHz Intel Core i5 laptop with 8GB of RAM)
 Here we obtain results for the utilitarian growth functions (Algorithms
 1 and 2 in the paper)
 
-###### Algorithm 1: Growth from One Origin
+##### Algorithm 1: Growth from One Origin
 
 Logic:
 
@@ -273,7 +282,7 @@ Results:
 
 </p>
 
-###### Algorithm 2 (Utilitarian Growth)
+##### Algorithm 2 (Utilitarian Growth)
 
 Logic:
 
@@ -310,7 +319,7 @@ Here we obtain results for the egalitarian growth function (Algorithms 3
 in the paper). We also compare the connectivity of the network proposed
 by both algorithms
 
-###### Algorithm 3 (Egalitarian Growth)
+##### Algorithm 3 (Egalitarian Growth)
 
 Logic:
 
@@ -345,7 +354,7 @@ types:
 
 </p>
 
-###### Comparing Connectivity of Algorithm 2 and 3
+##### Comparing Connectivity of Algorithm 2 and 3
 
 We check the number of connected components and the size of the Largest
 Connected Component as road segments are added to the solution (the
