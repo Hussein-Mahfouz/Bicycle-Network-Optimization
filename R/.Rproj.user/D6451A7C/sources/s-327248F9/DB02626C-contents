@@ -201,7 +201,7 @@ tmap_save(tm = p, filename = paste0("../data/", chosen_city,"/Plots/OSM_identify
 
 
 # create a combined geometry with all edges matching either of the three conditions
-# highway == 'cycleway' | bicycle == 'designated' | cycleway == 'track'. Since we know that that neigher of them
+# highway == 'cycleway' | bicycle == 'designated' | cycleway == 'track'. Since we know that none of them
 # completely contains the other
 graph_sf_cycle <- streetnet2 %>% 
   filter(highway == 'cycleway' | bicycle == 'designated' | cycleway == 'track') %>%
