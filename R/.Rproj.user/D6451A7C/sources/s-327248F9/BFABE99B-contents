@@ -46,7 +46,7 @@ The scripts should be run in the order they are numbered in (and listed in here)
 This script matches MSOA to major towns and cities using data from [here](http://geoportal.statistics.gov.uk/datasets/78ff27e752e44c3194617017f3f15929). 
 It then matches the results to the Census flow data so that all OD pairs have an Origin City and Destination City (MSOAs in rural areas are not matched to a city)
 
-In this script, you choose which city you wish to run the analysis from this list of available cities: 
+In this script, you choose which city you wish to run the analysis from this list of available towns and cities: 
 
 
 ```{r, warning=FALSE, echo=FALSE, message=FALSE}
