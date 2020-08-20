@@ -57,18 +57,19 @@ city_names <- read_csv('./data-raw/Middle_Layer_Super_Output_Area__2011__to_Majo
 # change column name
 city_names <- city_names %>% rename(city = TCITY15NM)
 
-#vector of unique city names
-x <- unique(city_names$city)
-# remove NA
-x<-x[!is.na(x)]
-# arrange alphabetically 
-x <- sort(x)
-# 112 cities. conver to dataframe with 7 columns
-cbind.data.frame(split(x, rep(1:7, times=length(x)/7)), stringsAsFactors=F) %>% 
-  gt() %>%
-  tab_header(title = "Towns & Cities") %>%
-  tab_options(column_labels.hidden = TRUE,
-              table.font.size = "14px")
+unique(city_names$city) %>% sort()
+# #vector of unique city names
+# x <- unique(city_names$city)
+# # remove NA
+# x<-x[!is.na(x)]
+# # arrange alphabetically 
+# x <- sort(x)
+# # 112 cities. conver to dataframe with 7 columns
+# cbind.data.frame(split(x, rep(1:7, times=length(x)/7)), stringsAsFactors=F) %>% 
+#   gt() %>%
+#   tab_header(title = "Towns & Cities") %>%
+#   tab_options(column_labels.hidden = TRUE,
+#               table.font.size = "14px")
 ```
 
 This is done in line 17. For example: 
