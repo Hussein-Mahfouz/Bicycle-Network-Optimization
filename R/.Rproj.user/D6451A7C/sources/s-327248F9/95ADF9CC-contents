@@ -1,0 +1,11 @@
+# vector of city names
+x <- unique(city_names$city)
+# remove NA
+x<-x[!is.na(x)]
+# arrange alphabetically 
+x <- sort(x)
+# 112 cities
+cbind.data.frame(split(x, rep(1:7, times=length(x)/7)), stringsAsFactors=F) %>% 
+  gt() %>%
+  tab_header(title = "Cities") %>%
+  tab_options(column_labels.hidden = TRUE)

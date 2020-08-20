@@ -51,47 +51,1119 @@ have an Origin City and Destination City (MSOAs in rural areas are not
 matched to a city)
 
 In this script, you choose which city you wish to run the analysis from
-this list of available
-    cities:
+this list of available cities:
 
-    ##   [1] "London"               NA                     "Bolton"              
-    ##   [4] "Stockport"            "Rochdale"             "Salford"             
-    ##   [7] "Manchester"           "Oldham"               "Bury"                
-    ##  [10] "Wigan"                "Rotherham"            "Liverpool"           
-    ##  [13] "Doncaster"            "Sheffield"            "St Helens"           
-    ##  [16] "Barnsley"             "Southport"            "Birkenhead"          
-    ##  [19] "Birmingham"           "Coventry"             "Dudley"              
-    ##  [22] "Newcastle upon Tyne"  "Sunderland"           "Sutton Coldfield"    
-    ##  [25] "South Shields"        "West Bromwich"        "Gateshead"           
-    ##  [28] "Leeds"                "Wolverhampton"        "Bradford"            
-    ##  [31] "Walsall"              "Huddersfield"         "Wakefield"           
-    ##  [34] "Solihull"             "Halifax"              "Leicester"           
-    ##  [37] "Nottingham"           "Hartlepool"           "Derby"               
-    ##  [40] "Blackpool"            "Grimsby"              "Warrington"          
-    ##  [43] "Scunthorpe"           "Kingston upon Hull"   "York"                
-    ##  [46] "Blackburn"            "Middlesbrough"        "Stockton-on-Tees"    
-    ##  [49] "Darlington"           "Telford"              "Stoke-on-Trent"      
-    ##  [52] "Swindon"              "Bristol"              "Peterborough"        
-    ##  [55] "Luton"                "Southend-on-Sea"      "Gillingham"          
-    ##  [58] "Plymouth"             "Weston-Super-Mare"    "Bath"                
-    ##  [61] "Bournemouth"          "Poole"                "Portsmouth"          
-    ##  [64] "Milton Keynes"        "Southampton"          "Bedford"             
-    ##  [67] "Reading"              "Chatham"              "Bracknell"           
-    ##  [70] "Slough"               "High Wycombe"         "Brighton and Hove"   
-    ##  [73] "Cambridge"            "Carlisle"             "Chester"             
-    ##  [76] "Chesterfield"         "Chelmsford"           "Basildon"            
-    ##  [79] "Eastbourne"           "Hastings"             "Exeter"              
-    ##  [82] "Colchester"           "Harlow"               "Cheltenham"          
-    ##  [85] "Gloucester"           "Hemel Hempstead"      "St Albans"           
-    ##  [88] "Stevenage"            "Basingstoke"          "Burnley"             
-    ##  [91] "Watford"              "Maidstone"            "Preston"             
-    ##  [94] "Norwich"              "Lincoln"              "Harrogate"           
-    ##  [97] "Northampton"          "Newcastle-under-Lyme" "Oxford"              
-    ## [100] "Mansfield"            "Shrewsbury"           "Burton upon Trent"   
-    ## [103] "Woking"               "Guildford"            "Ipswich"             
-    ## [106] "Crawley"              "Nuneaton"             "Worthing"            
-    ## [109] "Redditch"             "Worcester"            "Swansea"             
-    ## [112] "Cardiff"              "Newport"
+<!--html_preserve-->
+
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#cjhqynsmde .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#cjhqynsmde .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#cjhqynsmde .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#cjhqynsmde .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#cjhqynsmde .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#cjhqynsmde .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#cjhqynsmde .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#cjhqynsmde .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#cjhqynsmde .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#cjhqynsmde .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#cjhqynsmde .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#cjhqynsmde .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#cjhqynsmde .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#cjhqynsmde .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cjhqynsmde .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cjhqynsmde .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#cjhqynsmde .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#cjhqynsmde .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cjhqynsmde .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#cjhqynsmde .gt_left {
+  text-align: left;
+}
+
+#cjhqynsmde .gt_center {
+  text-align: center;
+}
+
+#cjhqynsmde .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#cjhqynsmde .gt_font_normal {
+  font-weight: normal;
+}
+
+#cjhqynsmde .gt_font_bold {
+  font-weight: bold;
+}
+
+#cjhqynsmde .gt_font_italic {
+  font-style: italic;
+}
+
+#cjhqynsmde .gt_super {
+  font-size: 65%;
+}
+
+#cjhqynsmde .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+
+<div id="cjhqynsmde" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+
+<table class="gt_table">
+
+<thead class="gt_header">
+
+<tr>
+
+<th colspan="7" class="gt_heading gt_title gt_font_normal" style>
+
+Towns &
+Cities
+
+</th>
+
+</tr>
+
+<tr>
+
+<th colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody class="gt_table_body">
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Barnsley
+
+</td>
+
+<td class="gt_row gt_left">
+
+Basildon
+
+</td>
+
+<td class="gt_row gt_left">
+
+Basingstoke
+
+</td>
+
+<td class="gt_row gt_left">
+
+Bath
+
+</td>
+
+<td class="gt_row gt_left">
+
+Bedford
+
+</td>
+
+<td class="gt_row gt_left">
+
+Birkenhead
+
+</td>
+
+<td class="gt_row gt_left">
+
+Birmingham
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Blackburn
+
+</td>
+
+<td class="gt_row gt_left">
+
+Blackpool
+
+</td>
+
+<td class="gt_row gt_left">
+
+Bolton
+
+</td>
+
+<td class="gt_row gt_left">
+
+Bournemouth
+
+</td>
+
+<td class="gt_row gt_left">
+
+Bracknell
+
+</td>
+
+<td class="gt_row gt_left">
+
+Bradford
+
+</td>
+
+<td class="gt_row gt_left">
+
+Brighton and Hove
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Bristol
+
+</td>
+
+<td class="gt_row gt_left">
+
+Burnley
+
+</td>
+
+<td class="gt_row gt_left">
+
+Burton upon Trent
+
+</td>
+
+<td class="gt_row gt_left">
+
+Bury
+
+</td>
+
+<td class="gt_row gt_left">
+
+Cambridge
+
+</td>
+
+<td class="gt_row gt_left">
+
+Cardiff
+
+</td>
+
+<td class="gt_row gt_left">
+
+Carlisle
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Chatham
+
+</td>
+
+<td class="gt_row gt_left">
+
+Chelmsford
+
+</td>
+
+<td class="gt_row gt_left">
+
+Cheltenham
+
+</td>
+
+<td class="gt_row gt_left">
+
+Chester
+
+</td>
+
+<td class="gt_row gt_left">
+
+Chesterfield
+
+</td>
+
+<td class="gt_row gt_left">
+
+Colchester
+
+</td>
+
+<td class="gt_row gt_left">
+
+Coventry
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Crawley
+
+</td>
+
+<td class="gt_row gt_left">
+
+Darlington
+
+</td>
+
+<td class="gt_row gt_left">
+
+Derby
+
+</td>
+
+<td class="gt_row gt_left">
+
+Doncaster
+
+</td>
+
+<td class="gt_row gt_left">
+
+Dudley
+
+</td>
+
+<td class="gt_row gt_left">
+
+Eastbourne
+
+</td>
+
+<td class="gt_row gt_left">
+
+Exeter
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Gateshead
+
+</td>
+
+<td class="gt_row gt_left">
+
+Gillingham
+
+</td>
+
+<td class="gt_row gt_left">
+
+Gloucester
+
+</td>
+
+<td class="gt_row gt_left">
+
+Grimsby
+
+</td>
+
+<td class="gt_row gt_left">
+
+Guildford
+
+</td>
+
+<td class="gt_row gt_left">
+
+Halifax
+
+</td>
+
+<td class="gt_row gt_left">
+
+Harlow
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Harrogate
+
+</td>
+
+<td class="gt_row gt_left">
+
+Hartlepool
+
+</td>
+
+<td class="gt_row gt_left">
+
+Hastings
+
+</td>
+
+<td class="gt_row gt_left">
+
+Hemel Hempstead
+
+</td>
+
+<td class="gt_row gt_left">
+
+High Wycombe
+
+</td>
+
+<td class="gt_row gt_left">
+
+Huddersfield
+
+</td>
+
+<td class="gt_row gt_left">
+
+Ipswich
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Kingston upon Hull
+
+</td>
+
+<td class="gt_row gt_left">
+
+Leeds
+
+</td>
+
+<td class="gt_row gt_left">
+
+Leicester
+
+</td>
+
+<td class="gt_row gt_left">
+
+Lincoln
+
+</td>
+
+<td class="gt_row gt_left">
+
+Liverpool
+
+</td>
+
+<td class="gt_row gt_left">
+
+London
+
+</td>
+
+<td class="gt_row gt_left">
+
+Luton
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Maidstone
+
+</td>
+
+<td class="gt_row gt_left">
+
+Manchester
+
+</td>
+
+<td class="gt_row gt_left">
+
+Mansfield
+
+</td>
+
+<td class="gt_row gt_left">
+
+Middlesbrough
+
+</td>
+
+<td class="gt_row gt_left">
+
+Milton Keynes
+
+</td>
+
+<td class="gt_row gt_left">
+
+Newcastle upon Tyne
+
+</td>
+
+<td class="gt_row gt_left">
+
+Newcastle-under-Lyme
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Newport
+
+</td>
+
+<td class="gt_row gt_left">
+
+Northampton
+
+</td>
+
+<td class="gt_row gt_left">
+
+Norwich
+
+</td>
+
+<td class="gt_row gt_left">
+
+Nottingham
+
+</td>
+
+<td class="gt_row gt_left">
+
+Nuneaton
+
+</td>
+
+<td class="gt_row gt_left">
+
+Oldham
+
+</td>
+
+<td class="gt_row gt_left">
+
+Oxford
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Peterborough
+
+</td>
+
+<td class="gt_row gt_left">
+
+Plymouth
+
+</td>
+
+<td class="gt_row gt_left">
+
+Poole
+
+</td>
+
+<td class="gt_row gt_left">
+
+Portsmouth
+
+</td>
+
+<td class="gt_row gt_left">
+
+Preston
+
+</td>
+
+<td class="gt_row gt_left">
+
+Reading
+
+</td>
+
+<td class="gt_row gt_left">
+
+Redditch
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Rochdale
+
+</td>
+
+<td class="gt_row gt_left">
+
+Rotherham
+
+</td>
+
+<td class="gt_row gt_left">
+
+Salford
+
+</td>
+
+<td class="gt_row gt_left">
+
+Scunthorpe
+
+</td>
+
+<td class="gt_row gt_left">
+
+Sheffield
+
+</td>
+
+<td class="gt_row gt_left">
+
+Shrewsbury
+
+</td>
+
+<td class="gt_row gt_left">
+
+Slough
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Solihull
+
+</td>
+
+<td class="gt_row gt_left">
+
+South Shields
+
+</td>
+
+<td class="gt_row gt_left">
+
+Southampton
+
+</td>
+
+<td class="gt_row gt_left">
+
+Southend-on-Sea
+
+</td>
+
+<td class="gt_row gt_left">
+
+Southport
+
+</td>
+
+<td class="gt_row gt_left">
+
+St Albans
+
+</td>
+
+<td class="gt_row gt_left">
+
+St Helens
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Stevenage
+
+</td>
+
+<td class="gt_row gt_left">
+
+Stockport
+
+</td>
+
+<td class="gt_row gt_left">
+
+Stockton-on-Tees
+
+</td>
+
+<td class="gt_row gt_left">
+
+Stoke-on-Trent
+
+</td>
+
+<td class="gt_row gt_left">
+
+Sunderland
+
+</td>
+
+<td class="gt_row gt_left">
+
+Sutton Coldfield
+
+</td>
+
+<td class="gt_row gt_left">
+
+Swansea
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Swindon
+
+</td>
+
+<td class="gt_row gt_left">
+
+Telford
+
+</td>
+
+<td class="gt_row gt_left">
+
+Wakefield
+
+</td>
+
+<td class="gt_row gt_left">
+
+Walsall
+
+</td>
+
+<td class="gt_row gt_left">
+
+Warrington
+
+</td>
+
+<td class="gt_row gt_left">
+
+Watford
+
+</td>
+
+<td class="gt_row gt_left">
+
+West Bromwich
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="gt_row gt_left">
+
+Weston-Super-Mare
+
+</td>
+
+<td class="gt_row gt_left">
+
+Wigan
+
+</td>
+
+<td class="gt_row gt_left">
+
+Woking
+
+</td>
+
+<td class="gt_row gt_left">
+
+Wolverhampton
+
+</td>
+
+<td class="gt_row gt_left">
+
+Worcester
+
+</td>
+
+<td class="gt_row gt_left">
+
+Worthing
+
+</td>
+
+<td class="gt_row gt_left">
+
+York
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<!--/html_preserve-->
 
 This is done in line 17. For example:
 

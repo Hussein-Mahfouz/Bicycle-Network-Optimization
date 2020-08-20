@@ -51,13 +51,24 @@ In this script, you choose which city you wish to run the analysis from this lis
 
 ```{r, warning=FALSE, echo=FALSE, message=FALSE}
 library(tidyverse)
+library(gt)
 # this is a lookup table matching MSOAs to major towns and cities
 city_names <- read_csv('./data-raw/Middle_Layer_Super_Output_Area__2011__to_Major_Towns_and_Cities__December_2015__Lookup_in_England_and_Wales.csv') 
 # change column name
 city_names <- city_names %>% rename(city = TCITY15NM)
 
-#unique cities
-unique(city_names$city)
+#vector of unique city names
+x <- unique(city_names$city)
+# remove NA
+x<-x[!is.na(x)]
+# arrange alphabetically 
+x <- sort(x)
+# 112 cities. conver to dataframe with 7 columns
+cbind.data.frame(split(x, rep(1:7, times=length(x)/7)), stringsAsFactors=F) %>% 
+  gt() %>%
+  tab_header(title = "Towns & Cities") %>%
+  tab_options(column_labels.hidden = TRUE,
+              table.font.size = "14px")
 ```
 
 This is done in line 17. For example: 
