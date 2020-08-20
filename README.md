@@ -51,7 +51,7 @@ have an Origin City and Destination City (MSOAs in rural areas are not
 matched to a city)
 
 In this script, you choose which city you wish to run the analysis from
-this list of available
+this list of available towns and
     cities:
 
     ##   [1] "Barnsley"             "Basildon"             "Basingstoke"         
