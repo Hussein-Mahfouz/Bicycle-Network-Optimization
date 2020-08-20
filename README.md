@@ -59,7 +59,7 @@ this list of available cities:
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#cjhqynsmde .gt_table {
+#jmwahgbxzv .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -84,7 +84,7 @@ this list of available cities:
   border-left-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_heading {
+#jmwahgbxzv .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -96,7 +96,7 @@ this list of available cities:
   border-right-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_title {
+#jmwahgbxzv .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -106,7 +106,7 @@ this list of available cities:
   border-bottom-width: 0;
 }
 
-#cjhqynsmde .gt_subtitle {
+#jmwahgbxzv .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -116,13 +116,13 @@ this list of available cities:
   border-top-width: 0;
 }
 
-#cjhqynsmde .gt_bottom_border {
+#jmwahgbxzv .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_col_headings {
+#jmwahgbxzv .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -137,7 +137,7 @@ this list of available cities:
   border-right-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_col_heading {
+#jmwahgbxzv .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -157,7 +157,7 @@ this list of available cities:
   overflow-x: hidden;
 }
 
-#cjhqynsmde .gt_column_spanner_outer {
+#jmwahgbxzv .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -169,15 +169,15 @@ this list of available cities:
   padding-right: 4px;
 }
 
-#cjhqynsmde .gt_column_spanner_outer:first-child {
+#jmwahgbxzv .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#cjhqynsmde .gt_column_spanner_outer:last-child {
+#jmwahgbxzv .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#cjhqynsmde .gt_column_spanner {
+#jmwahgbxzv .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -189,7 +189,7 @@ this list of available cities:
   width: 100%;
 }
 
-#cjhqynsmde .gt_group_heading {
+#jmwahgbxzv .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -211,7 +211,7 @@ this list of available cities:
   vertical-align: middle;
 }
 
-#cjhqynsmde .gt_empty_group_heading {
+#jmwahgbxzv .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -226,15 +226,15 @@ this list of available cities:
   vertical-align: middle;
 }
 
-#cjhqynsmde .gt_from_md > :first-child {
+#jmwahgbxzv .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#cjhqynsmde .gt_from_md > :last-child {
+#jmwahgbxzv .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#cjhqynsmde .gt_row {
+#jmwahgbxzv .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -253,7 +253,7 @@ this list of available cities:
   overflow-x: hidden;
 }
 
-#cjhqynsmde .gt_stub {
+#jmwahgbxzv .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -265,7 +265,7 @@ this list of available cities:
   padding-left: 12px;
 }
 
-#cjhqynsmde .gt_summary_row {
+#jmwahgbxzv .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -275,7 +275,7 @@ this list of available cities:
   padding-right: 5px;
 }
 
-#cjhqynsmde .gt_first_summary_row {
+#jmwahgbxzv .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -285,7 +285,7 @@ this list of available cities:
   border-top-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_grand_summary_row {
+#jmwahgbxzv .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -295,7 +295,7 @@ this list of available cities:
   padding-right: 5px;
 }
 
-#cjhqynsmde .gt_first_grand_summary_row {
+#jmwahgbxzv .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -305,11 +305,11 @@ this list of available cities:
   border-top-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_striped {
+#jmwahgbxzv .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#cjhqynsmde .gt_table_body {
+#jmwahgbxzv .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -318,7 +318,7 @@ this list of available cities:
   border-bottom-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_footnotes {
+#jmwahgbxzv .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -332,13 +332,13 @@ this list of available cities:
   border-right-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_footnote {
+#jmwahgbxzv .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#cjhqynsmde .gt_sourcenotes {
+#jmwahgbxzv .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -352,47 +352,47 @@ this list of available cities:
   border-right-color: #D3D3D3;
 }
 
-#cjhqynsmde .gt_sourcenote {
+#jmwahgbxzv .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#cjhqynsmde .gt_left {
+#jmwahgbxzv .gt_left {
   text-align: left;
 }
 
-#cjhqynsmde .gt_center {
+#jmwahgbxzv .gt_center {
   text-align: center;
 }
 
-#cjhqynsmde .gt_right {
+#jmwahgbxzv .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cjhqynsmde .gt_font_normal {
+#jmwahgbxzv .gt_font_normal {
   font-weight: normal;
 }
 
-#cjhqynsmde .gt_font_bold {
+#jmwahgbxzv .gt_font_bold {
   font-weight: bold;
 }
 
-#cjhqynsmde .gt_font_italic {
+#jmwahgbxzv .gt_font_italic {
   font-style: italic;
 }
 
-#cjhqynsmde .gt_super {
+#jmwahgbxzv .gt_super {
   font-size: 65%;
 }
 
-#cjhqynsmde .gt_footnote_marks {
+#jmwahgbxzv .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
 
-<div id="cjhqynsmde" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="jmwahgbxzv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 
 <table class="gt_table">
 
