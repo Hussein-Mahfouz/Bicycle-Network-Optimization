@@ -103,7 +103,7 @@ tm_shape(city_geom) +
              lwd = 1, 
              alpha = 0.5) +
 tm_shape(desire_cycling_long) +
-  tm_lines(title.col = "Flow",
+  tm_lines(title.col = "Cycling Demand (Commuters)",
            lwd = "value",
            col= "value",
            palette = "YlOrRd",
