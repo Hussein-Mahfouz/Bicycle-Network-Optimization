@@ -4,6 +4,8 @@
 library(tidyverse)
 library(sf)
 library(tmap)
+library(latex2exp)
+
 
 
 uptake_decay <- readr::read_csv(paste0("../data/",chosen_city,"/flows_for_desire_lines.csv"))
@@ -131,31 +133,63 @@ uptake_decay <- lwgeom::st_make_valid(uptake_decay)
 uptake_plot <- uptake_decay %>% filter(dist <= 10)
 
 
-# plot all flows
+# # plot all flows
+
+# tm_shape(city_geom) +
+#   tm_borders(col = "grey80", 
+#              lwd = 1, 
+#              alpha = 0.5) +
+#   tm_shape(uptake_plot) +
+#   tm_lines(title.col = "Ratio: OD Pair Cycling Mode Share / \nGroup Average Cycling Mode Share",
+#            legend.lwd.show = FALSE,   # remove lineweight legend
+#            #lwd = "perc_cycle",
+#            lwd = 0.7,
+#            #lwd = "ratio",
+#            col = "ratio",
+#            breaks = c(0, 0.2, 0.5, 1, 3, 10),
+#            midpoint = 1,     # the color palette will split at this point
+#            style = "fixed",
+#            #palette = "RdYlGn",
+#            palette = c('#d7191c', '#fdae61', '#ffffbf', '#a6d96a', '#1a9641'),
+#            #style = "pretty",
+#            scale = 2) +
+#   tm_facets(by="distance_groups",
+#             nrow = 2,
+#             free.coords=FALSE,
+#             showNA = FALSE) +
+#   tm_layout(fontfamily = 'Georgia',
+#             main.title = 'Comparison of Cycling Uptake Across the City', 
+#             main.title.color = 'grey50',
+#             legend.title.size = 0.8,
+#             frame = FALSE) -> p
+
 tm_shape(city_geom) +
   tm_borders(col = "grey80", 
              lwd = 1, 
              alpha = 0.5) +
   tm_shape(uptake_plot) +
-  tm_lines(title.col = "Ratio: OD Pair Cycling Mode Share / \nGroup Average Cycling Mode Share",
-           legend.lwd.show = FALSE,   # remove lineweight legend
-           #lwd = "perc_cycle",
-           lwd = 0.7,
-           #lwd = "ratio",
-           col = "ratio",
-           breaks = c(0, 0.2, 0.5, 1, 3, 10),
-           midpoint = 1,     # the color palette will split at this point
-           style = "fixed",
-           #palette = "RdYlGn",
-           palette = c('#d7191c', '#fdae61', '#ffffbf', '#a6d96a', '#1a9641'),
-           #style = "pretty",
-           scale = 2) +
+  tm_lines(#title.col = "Ratio: OD Pair Cycling Mode Share / \nGroup Average Cycling Mode Share",
+    #title.col = TeX("$\\alpha_{ij} = \\phi(c_{ij}) / P(c_{ij})$"),
+    #title.col = TeX("Performance ($\\alpha_{ij})$"),
+    title.col = expression(paste("Performance (", alpha[ij],")")),
+    legend.lwd.show = FALSE,   # remove lineweight legend
+    #lwd = "perc_cycle",
+    lwd = 0.7,
+    #lwd = "ratio",
+    col = "performance",
+    breaks = c(0, 0.2, 0.5, 1, 3, 10),
+    midpoint = 1,     # the color palette will split at this point
+    style = "fixed",
+    #palette = "RdYlGn",
+    palette = c('#d7191c', '#fdae61', '#ffffbf', '#a6d96a', '#1a9641'),
+    #style = "pretty",
+    scale = 2) +
   tm_facets(by="distance_groups",
             nrow = 2,
             free.coords=FALSE,
             showNA = FALSE) +
   tm_layout(fontfamily = 'Georgia',
-            main.title = 'Comparison of Cycling Uptake Across the City', 
+            main.title = paste0('Comparison of Cycling Uptake Across ', chosen_city), 
             main.title.color = 'grey50',
             legend.title.size = 0.8,
             frame = FALSE) -> p

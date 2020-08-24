@@ -155,6 +155,19 @@ uptake_decay$distance_groups_comb <- ifelse(uptake_decay$distance_groups %in% c(
 
 
 # Mode Share Increase VS Performance (Under/Over) - geom smooth
+
+# uptake_decay %>% filter(!(is.na(distance_groups))) %>%
+#   filter(distance_groups %in% c("0-1 km", "1-2 km", "2-3 km", "3-4 km", "4-5 km", "5-6 km",
+#                                 "6-7 km", "7-8 km", "8-9 km", "9-10 km")) %>% 
+#   ggplot() + 
+#   geom_smooth(aes(x = performance, y = (cycle_added_weighted / `All categories: Method of travel to work`) * 100,
+#                   color = distance_groups_comb)) + 
+#   theme_minimal() +
+#   #scale_colour_brewer(palette = "Set3") +
+#   labs(title = "", 
+#        x="Existing Cycling Mode Share As Fraction of Cycling Potential", y = "Cycling Mode Share Increase (%)", 
+#        color = "Distance \nSeparating \nOD Pair") 
+
 uptake_decay %>% filter(!(is.na(distance_groups))) %>%
   filter(distance_groups %in% c("0-1 km", "1-2 km", "2-3 km", "3-4 km", "4-5 km", "5-6 km",
                                 "6-7 km", "7-8 km", "8-9 km", "9-10 km")) %>% 
@@ -162,13 +175,29 @@ uptake_decay %>% filter(!(is.na(distance_groups))) %>%
   geom_smooth(aes(x = performance, y = (cycle_added_weighted / `All categories: Method of travel to work`) * 100,
                   color = distance_groups_comb)) + 
   theme_minimal() +
-  #scale_colour_brewer(palette = "Set3") +
+  #scale_colour_brewer(palette = "Blues") +
   labs(title = "", 
-       x="Existing Cycling Mode Share As Fraction of Cycling Potential", y = "Cycling Mode Share Increase (%)", 
-       color = "Distance \nSeparating \nOD Pair") 
+       x=expression(paste("Performance (", alpha[ij],")")), y = "Cycling Mode Share Increase (%)", 
+       color = "Distance Between \nOD Pair (km)") 
+
+# uptake_decay %>% filter(!(is.na(distance_groups))) %>%
+#   filter(distance_groups %in% c("0-1 km", "1-2 km", "2-3 km", "3-4 km", "4-5 km", "5-6 km",
+#                                 "6-7 km", "7-8 km", "8-9 km", "9-10 km")) %>% 
+#   ggplot() + 
+#   geom_smooth(aes(x = performance, y = (cycle_added_weighted / `All categories: Method of travel to work`) * 100,
+#                   color = distance_groups_comb)) + 
+#   theme(text = element_text(size=10)) +
+#   #scale_colour_brewer(palette = "Blues") +
+#   labs(title = "", 
+#        x=TeX("Performance $\\alpha_{ij}$ = Cycling Mode Share $\\phi(c_{ij})$ / Probability of Cycling $P(c_{ij})$"), 
+#        y = "Cycling Mode Share Increase (%)", 
+#        color = "Distance Between \nOD Pair (km)") 
 
 
 ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_increase_vs_performance_smooth_" , chosen_city, ".png"))
+
+
+
 
 # Mode Share Increase VS Performance (Under/Over) - geom point
 uptake_decay %>% filter(!(is.na(distance_groups))) %>%
@@ -184,6 +213,11 @@ uptake_decay %>% filter(!(is.na(distance_groups))) %>%
        color = "Distance Between \nOD Pair (km)") 
 
 ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_increase_vs_performance_point_",chosen_city, ".png"))
+
+
+
+
+
 
 
 #save csv for routing
