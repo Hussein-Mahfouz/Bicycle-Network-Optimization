@@ -12,7 +12,7 @@ analysis can be reproduced.
 ## Paper
 
 The paper can be found in the repo, or through this
-[link](https://github.com/Hussein-Mahfouz/Bicycle-Network-Optimization/blob/master/Paper/CASA_Dissertation_16_August.pdf)
+[link](https://github.com/Hussein-Mahfouz/Bicycle-Network-Optimization/blob/master/Paper/Dissertation%20Final%20Draft.pdf)
 
 -----
 
@@ -25,8 +25,8 @@ in the repo file structure
 
 Flow Data (2011 Census Origin-Destination Data):
 
-  - Source: <https://www.nomisweb.co.uk/census/2011/bulk/rOD1> Choose
-    File **“WU03EW”**
+  - Source: <https://www.nomisweb.co.uk/census/2011/bulk/rOD1> —\>
+    Choose File **“WU03EW”**
   - Location in Repo: data-raw/flow\_data.csv
 
 Middle Layer Super Output Areas (December 2011) Boundaries:

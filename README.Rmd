@@ -15,7 +15,7 @@ This repository contains the code used for the dissertation of my MSc in [Smart 
 
 ## Paper
 
-The paper can be found in the repo, or through this [link](https://github.com/Hussein-Mahfouz/Bicycle-Network-Optimization/blob/master/Paper/CASA_Dissertation_16_August.pdf)
+The paper can be found in the repo, or through this [link](https://github.com/Hussein-Mahfouz/Bicycle-Network-Optimization/blob/master/Paper/Dissertation%20Final%20Draft.pdf)
 
 ***
 
@@ -25,7 +25,7 @@ There are a couple of files that cannot be synced to github due to their size. T
 
 Flow Data (2011 Census Origin-Destination Data): 
 
-* Source: https://www.nomisweb.co.uk/census/2011/bulk/rOD1  Choose File **"WU03EW"**
+* Source: https://www.nomisweb.co.uk/census/2011/bulk/rOD1  ---> Choose File **"WU03EW"**
 * Location in Repo: data-raw/flow_data.csv
 
 
