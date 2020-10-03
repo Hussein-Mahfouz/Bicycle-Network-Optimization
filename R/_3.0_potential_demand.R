@@ -84,9 +84,9 @@ uptake_decay$non_active <- uptake_decay$`All categories: Method of travel to wor
 # ATTEMPT 2: NEGATIVE EXPONENTIAL
 
 # We want to scale down the probability of cycling by the current performance level, so we use an exponential
-# 1. y = ae^-bx    (a is y intercept at x = 0, b is decay rate) ---- choose a = 1
+# [1]. y = ae^-bx    (a is y intercept at x = 0, b is decay rate) ---- choose a = 1
    # x = performance, y = scaling factor
-# 2. Get b in terms of a
+# [2]. Get b in terms of a
 #####  NEEDS REVEIWING - START #####
    # Choose the value of y at x = 1
    # we can make y = target % increase when x = 1. (so y = 0.1). 
@@ -98,7 +98,7 @@ uptake_decay$non_active <- uptake_decay$`All categories: Method of travel to wor
    # b = ln(a) - ln(0.5) = ln(a/0.5) = ln(2a)      
    ###### y =  ae^-(ln(2a))x  
 
-# 3.   Use the exponential to scale down the probabilities based on performance 
+# [3].   Use the exponential to scale down the probabilities based on performance 
    # scaling factor =   e^-(ln( 2 ))  * performance 
 
 

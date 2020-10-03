@@ -2,12 +2,14 @@ library(tidyverse)
 library(pct)
 library(sf)
 
-###### 1. GET THE DATA - START ######
+        # ------------------  1. GET THE DATA - START ------------------ #
+
 flow <- pct::get_pct(region = "london", layer = "rf")
 
-###### 1. GET THE DATA - END ######
+        # ------------------ 1. GET THE DATA - END  ------------------ #
 
-###### 2. PROBABILITY OF CYCLING (GLM) - START ######
+        # ------------------ 2. PROBABILITY OF CYCLING (GLM) - START ------------------ #
+
 #copy the data to another df and keep only the necessary columns
 uptake <- flow %>% 
   st_drop_geometry %>%
@@ -52,10 +54,10 @@ ggplot(uptake, aes(x = performance)) +
   geom_vline(xintercept = 1, linetype="dotted", size=0.5) +
   labs(x="Existing Cycling Mode Share As a Fraction of Cycling Potential", y = "No. of OD Pairs") 
 
-###### 2. PROBABILITY OF CYCLING (GLM) - END ######
+        # ------------------ 2. PROBABILITY OF CYCLING (GLM) - END ------------------ #
 
 
-###### 3. DISTRIBUTE ADDITIONAL FLOWS - START ######
+        # ------------------ 3. DISTRIBUTE ADDITIONAL FLOWS - START ------------------ #
 
 # what is the current cycling mode share
 cycle_current <- sum(uptake$bicycle) / sum(uptake$all)
@@ -72,16 +74,31 @@ cycle_add
 uptake$non_active <- uptake$all - (uptake$bicycle + uptake$foot)
 
 # this would be the additional number of cyclists if we did not have a target to calibrate to:
-# if OD pair is overperforming (performance > 1):
-# then it has less potential cyclists, the probability is scaled down by the performance, so that OD pairs that 
-# already have well established levels of cycling aren't assigned unrealistic potential demand
-# if OD pair is underperforming (performance <= 1):
-# it has more potential cyclists, we multiply by the probability without scaling down
-uptake <- mutate(uptake, cycle_added_unweighted = 
-                         ifelse(performance > 1, # condition
-                                non_active * (prob_cycle/performance), # if true (overperforming)
-                                non_active * prob_cycle))  # if false (underperforming)
 
+        # ----------------------- NEGATIVE EXPONENTIAL [START]  ----------------------- #
+
+# We want to scale down the probability of cycling by the current performance level, so we use an exponential
+# [1]. y = ae^-bx    (a is y intercept at x = 0, b is decay rate) ---- choose a = 1
+    # x = performance, y = scaling factor
+# [2]. Get b in terms of a
+    #####  NEEDS REVEIWING - START #####
+    # Choose the value of y at x = 1
+    # we can make y = target % increase when x = 1. (so y = 0.1). 
+    # Or y = 0.5, gives more resonable results. The one above is very biased towards 
+    #####  NEEDS REVEIWING - END #####
+    # At x = 1 -> y = ae^-b  ..... 0.5 = ae^-b
+    # e^-b = 0.5/a
+    # -b = ln(0.5/a) = ln(0.5) - ln(a)
+    # b = ln(a) - ln(0.5) = ln(a/0.5) = ln(2a)      
+    ###### y =  ae^-(ln(2a))x  
+
+# [3].   Use the exponential to scale down the probabilities based on performance 
+# scaling factor =   e^-(ln( 2 ))  * performance 
+
+uptake <- mutate(uptake, 
+                       cycle_added_unweighted = (non_active * prob_cycle) * exp(-(log(2)*performance)))
+
+      # ----------------------- NEGATIVE EXPONENTIAL [END]  ----------------------- #
 
 # But we need to adjust these values so that the additional cyclists = cycle_add
 # We solve for X (multiply_factor):
@@ -102,10 +119,10 @@ max(uptake$cycle_fraction)
 # mode share of potential_demand column should = cycle_target (20%)
 sum(uptake$potential_demand) / sum(uptake$all)
 
-###### 3. DISTRIBUTE ADDITIONAL FLOWS - END ######
+        # ------------------ 3. DISTRIBUTE ADDITIONAL FLOWS - END ------------------ #
 
 
-###### 4. VISUALIING RESULTS ######
+        # ------------------ 4. VISUALIING RESULTS - START ------------------ #
 
 # UPTAKE VS DISTANCE
 
@@ -160,5 +177,4 @@ uptake %>% filter(!(is.na(distance_groups))) %>%
        x="Existing Cycling Mode Share As Fraction of Cycling Potential", y = "Cycling Mode Share Increase (%)", 
        color = "Distance Between \nOD Pair (km)") 
 
-
-
+        # ------------------ 4. VISUALIING RESULTS - END ------------------ #

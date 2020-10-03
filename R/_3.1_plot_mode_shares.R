@@ -40,7 +40,7 @@ flow_waffle <- flow_pie
 # change values to % so that we have 100 boxes in the waffle chart
 flow_waffle$value <- (flow_waffle$value / sum(flow_waffle$value)) * 100  
 # plot
-waffle(parts = flow_waffle , rows = 6, title = paste0("Mode Share - ", chosen_city), 
+waffle(parts = flow_waffle$value , rows = 6, title = paste0("Mode Share - ", chosen_city), 
        legend_pos = "bottom")  
 
 ggsave(paste0("../data/", chosen_city,"/Plots/mode_share_waffle.png"))

@@ -98,7 +98,7 @@ aggregate_flows <- function(graph, from, to, flows){
         contract = TRUE, 
         quiet = FALSE)
   # turn into undirected graph
-  graph_undir <- dodgr::merge_directed_flows(graph_flows)
+  graph_undir <- dodgr::merge_directed_graph(graph_flows)
   # convert to sf
   graph_sf <-  dodgr::dodgr_to_sf(graph_undir)
   return(graph_sf)
